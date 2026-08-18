@@ -11,11 +11,11 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
-// Mounted in both SiteHeader (storefront) and the admin layout header —
-// site-wide now, not admin-only (see src/app/manifest.ts, src/app/sw.js).
-// Whichever one happens to be on screen when the browser fires
-// beforeinstallprompt catches it; harmless for both to listen since a page
-// is always exactly one or the other.
+// Mounted only in the admin layout header — the "Install app" affordance is
+// admin-only by request, even though the manifest/service worker
+// (src/app/manifest.ts, src/app/sw.js) are still registered at the app
+// root, not admin-scoped, so admin installability doesn't depend on which
+// page the admin happened to log in from.
 export function PwaRegister({ className }: { className?: string }) {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(
     null

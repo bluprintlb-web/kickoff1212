@@ -2,13 +2,15 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { AccountMenu } from "@/components/account-menu";
+import { CampaignMotifs } from "@/components/campaign-motifs";
 import { CartMenu } from "@/components/cart-menu";
 import { LanguageToggle } from "@/components/language-toggle";
 import { Logo } from "@/components/logo";
-import { PwaRegister } from "@/components/pwa-register";
 import { SocialLinks } from "@/components/social-icons";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { TRIM_MOTIF_SLOTS } from "@/lib/campaign-visuals";
+import { getActiveCampaign } from "@/lib/football-events";
 import { dictionaries } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/get-locale";
 import {
@@ -79,12 +81,20 @@ function CategoryDropdown({
 export async function SiteHeader() {
   const [session, locale] = await Promise.all([auth(), getLocale()]);
   const dict = dictionaries[locale];
+  // Same active campaign the promo bar themes itself around (see
+  // CampaignBanner) — the header picks up a thin themed trim strip below it
+  // so the event reads sitewide, not just in that one strip.
+  const campaign = getActiveCampaign();
 
   let cartCount = 0;
   if (session?.user) {
+    // A session cookie can briefly outlive the account behind it (see
+    // cart.ts's staleSessionOrRethrow) — the header renders on every
+    // storefront page, so a stale-session error here shouldn't take the
+    // whole page down over a cart badge count.
     const trpc = await trpcCaller();
-    const cart = await trpc.cart.get();
-    cartCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+    const cart = await trpc.cart.get().catch(() => null);
+    cartCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0;
   }
 
   return (
@@ -126,7 +136,6 @@ export async function SiteHeader() {
             locale={locale}
             className="border-white/15 bg-white/5 text-surface-brand-foreground"
           />
-          <PwaRegister className="border-white/15 bg-white/5 text-surface-brand-foreground hover:bg-white/10" />
           {!session?.user && (
             <>
               <Link href="/login">
@@ -289,6 +298,18 @@ export async function SiteHeader() {
           })}
         </nav>
       </div>
+      {campaign && (
+        <div
+          className="relative h-1.5 overflow-hidden"
+          style={{ background: campaign.gradient }}
+        >
+          <CampaignMotifs
+            campaign={campaign}
+            slots={TRIM_MOTIF_SLOTS}
+            iconClassName="size-2 text-white/60"
+          />
+        </div>
+      )}
     </header>
   );
 }

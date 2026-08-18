@@ -27,8 +27,12 @@ async function requirePasswordMatch(
 }
 
 export const userRouter = router({
+  // findUnique (not findUniqueOrThrow) — a session cookie can briefly outlive
+  // the account behind it right after self-deletion (see cart.ts's
+  // staleSessionOrRethrow for the same race), so null is an expected result
+  // here, not just an edge case to crash on.
   me: protectedProcedure.query(({ ctx }) =>
-    ctx.prisma.user.findUniqueOrThrow({
+    ctx.prisma.user.findUnique({
       where: { id: ctx.session.user.id },
       select: { id: true, name: true, email: true },
     })

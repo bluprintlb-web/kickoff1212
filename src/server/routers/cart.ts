@@ -1,21 +1,47 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { Prisma } from "@/generated/prisma/client";
 import { protectedProcedure, router } from "@/server/trpc";
 
+// JWT sessions are stateless: a session cookie can still look valid for a
+// brief window right after the account behind it is deleted (deleteAccount
+// deletes the User row, then signs the browser out — those two steps aren't
+// atomic). Any cart upsert in that window violates Cart_userId_fkey against
+// a User row that no longer exists. Surfacing that as a clean "your session
+// is gone" error (instead of a raw 500) is what the caller should do with it
+// anyway, since the user is about to be signed out regardless.
+function staleSessionOrRethrow(err: unknown): never {
+  if (
+    err instanceof Prisma.PrismaClientKnownRequestError &&
+    err.code === "P2003"
+  ) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Your session has expired. Please log in again.",
+    });
+  }
+  throw err;
+}
+
 export const cartRouter = router({
-  get: protectedProcedure.query(({ ctx }) =>
-    ctx.prisma.cart.upsert({
-      where: { userId: ctx.session.user.id },
-      create: { userId: ctx.session.user.id },
-      update: {},
-      include: {
-        items: {
-          include: {
-            variant: { include: { product: { omit: { costPrice: true } } } },
+  get: protectedProcedure.query(async ({ ctx }) => {
+    try {
+      return await ctx.prisma.cart.upsert({
+        where: { userId: ctx.session.user.id },
+        create: { userId: ctx.session.user.id },
+        update: {},
+        include: {
+          items: {
+            include: {
+              variant: { include: { product: { omit: { costPrice: true } } } },
+            },
           },
         },
-      },
-    })
-  ),
+      });
+    } catch (err) {
+      staleSessionOrRethrow(err);
+    }
+  }),
 
   addItem: protectedProcedure
     .input(
@@ -25,11 +51,13 @@ export const cartRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const cart = await ctx.prisma.cart.upsert({
-        where: { userId: ctx.session.user.id },
-        create: { userId: ctx.session.user.id },
-        update: {},
-      });
+      const cart = await ctx.prisma.cart
+        .upsert({
+          where: { userId: ctx.session.user.id },
+          create: { userId: ctx.session.user.id },
+          update: {},
+        })
+        .catch(staleSessionOrRethrow);
 
       return ctx.prisma.cartItem.upsert({
         where: {

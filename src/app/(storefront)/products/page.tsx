@@ -1,4 +1,7 @@
+import { CampaignMotifs } from "@/components/campaign-motifs";
 import { ProductCard } from "@/components/product-card";
+import { BANNER_MOTIF_SLOTS } from "@/lib/campaign-visuals";
+import { getActiveCampaign } from "@/lib/football-events";
 import { dictionaries, t } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/get-locale";
 import {
@@ -25,18 +28,35 @@ export default async function ProductsPage({
   const filtered = activeCategory
     ? products.filter((product) => product.category === activeCategory)
     : products;
+  // Same active campaign as the header/hero — browsing should feel themed
+  // too, not just the homepage.
+  const campaign = getActiveCampaign();
 
   return (
     <div className="flex w-full flex-1 flex-col">
-      <div className="border-b bg-gradient-to-r from-accent/10 via-brand/5 to-accent/10">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-12">
+      <div
+        className="relative overflow-hidden border-b bg-gradient-to-r from-accent/10 via-brand/5 to-accent/10"
+        style={campaign ? { background: campaign.gradient } : undefined}
+      >
+        {campaign && (
+          <div className="absolute inset-0 bg-black/10">
+            <CampaignMotifs campaign={campaign} slots={BANNER_MOTIF_SLOTS} iconClassName="size-4 text-white/40" />
+          </div>
+        )}
+        <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-12">
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-            <h1 className="text-3xl font-bold tracking-tight">
+            <h1
+              className={
+                campaign
+                  ? "text-3xl font-bold tracking-tight text-white"
+                  : "text-3xl font-bold tracking-tight"
+              }
+            >
               {activeCategory
                 ? dict.categories[activeCategory]
                 : dict.productsPage.allProducts}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className={campaign ? "text-sm text-white/70" : "text-sm text-muted-foreground"}>
               {t(
                 filtered.length === 1
                   ? dict.productsPage.productsCount

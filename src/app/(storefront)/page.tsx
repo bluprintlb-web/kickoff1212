@@ -1,8 +1,15 @@
 import { MapPin, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { CampaignMotifs } from "@/components/campaign-motifs";
 import { ProductCard } from "@/components/product-card";
 import { Button } from "@/components/ui/button";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
+import {
+  CAMPAIGN_COPY_KEY,
+  CAMPAIGN_ICON,
+  HERO_MOTIF_SLOTS,
+} from "@/lib/campaign-visuals";
+import { getActiveCampaign } from "@/lib/football-events";
 import { dictionaries } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/get-locale";
 import { PRODUCT_CATEGORIES } from "@/lib/product-category";
@@ -12,6 +19,11 @@ export default async function HomePage() {
   const [trpc, locale] = await Promise.all([trpcCaller(), getLocale()]);
   const products = await trpc.product.list();
   const dict = dictionaries[locale];
+  // Same active campaign as the promo bar/header/footer trim — the hero is
+  // the one surface with enough room to actually feel themed, not just
+  // trimmed, so it gets a gradient wash, motifs, and its own badge line.
+  const campaign = getActiveCampaign();
+  const CampaignIcon = campaign ? CAMPAIGN_ICON[campaign.id] : null;
 
   const TRUST_ITEMS = [
     {
@@ -33,7 +45,24 @@ export default async function HomePage() {
           aria-hidden
           className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,color-mix(in_oklch,var(--accent),transparent_80%),transparent_60%)]"
         />
+        {campaign && (
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-25"
+            style={{ background: campaign.gradient }}
+          />
+        )}
+        {campaign && <CampaignMotifs campaign={campaign} slots={HERO_MOTIF_SLOTS} iconClassName="size-4 text-white/50" />}
         <div className="animate-in fade-in slide-in-from-bottom-4 relative mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-24 duration-700 sm:py-28">
+          {campaign && CampaignIcon && (
+            <span
+              className="inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold tracking-wide text-white uppercase"
+              style={{ background: campaign.gradient }}
+            >
+              <CampaignIcon className="size-3.5 shrink-0" />
+              {dict.campaigns[CAMPAIGN_COPY_KEY[campaign.id]]}
+            </span>
+          )}
           <span className="w-fit rounded-full bg-white/10 px-3 py-1 text-xs font-medium tracking-wide text-accent uppercase">
             {dict.hero.badge}
           </span>

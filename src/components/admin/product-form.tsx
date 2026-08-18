@@ -416,8 +416,8 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
                 key={row.clientId}
                 className={
                   isSized
-                    ? "grid grid-cols-[60px_1fr_1fr_auto] items-end gap-2 rounded-md border p-3"
-                    : "grid grid-cols-[1fr_1fr_80px_1fr_auto_auto] items-end gap-2 rounded-md border p-3"
+                    ? "grid grid-cols-2 items-end gap-2 rounded-md border p-3 sm:grid-cols-[60px_1fr_1fr_auto]"
+                    : "grid grid-cols-2 items-end gap-2 rounded-md border p-3 sm:grid-cols-[1fr_1fr_80px_1fr_auto_auto]"
                 }
               >
                 {isSized ? (
