@@ -236,6 +236,25 @@ export async function SiteHeader() {
                 />
               );
             }
+            if (category === "BODYWEAR") {
+              return (
+                <CategoryDropdown
+                  key={category}
+                  category={category}
+                  label={dict.categories[category]}
+                  items={[
+                    {
+                      href: `/products?category=${category}&type=leggings`,
+                      label: dict.bodywearMenu.leggings,
+                    },
+                    {
+                      href: `/products?category=${category}&type=body`,
+                      label: dict.bodywearMenu.body,
+                    },
+                  ]}
+                />
+              );
+            }
             if (category === "SHIN_PADS") {
               return (
                 <CategoryDropdown

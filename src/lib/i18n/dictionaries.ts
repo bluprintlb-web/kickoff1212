@@ -186,6 +186,10 @@ const en = {
     withBones: "With bones",
     withoutBones: "Without bones",
   },
+  bodywearMenu: {
+    leggings: "Leggings",
+    body: "Body",
+  },
   shinPadsMenu: {
     big: "Big",
     small: "Small",
@@ -431,6 +435,10 @@ const ar: typeof en = {
     mens: "رجالي",
     withBones: "بعظام",
     withoutBones: "بدون عظام",
+  },
+  bodywearMenu: {
+    leggings: "ليقنز",
+    body: "بودي",
   },
   shinPadsMenu: {
     big: "كبير",
