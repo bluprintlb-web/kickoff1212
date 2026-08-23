@@ -106,6 +106,27 @@ export function BarcodeScanner({
       )
       .then((controls) => {
         controlsRef.current = controls;
+        // Real hardware zoom (where the device exposes it) gives the sensor
+        // itself more detail to work with, on top of the crop-and-stretch
+        // trick above — the crop alone is limited by what the 1920x1080
+        // capture already contains. Experimental/Chromium-only and absent
+        // on iOS Safari and most webcams, so this is best-effort: read the
+        // track's zoom range and step partway into it rather than assuming
+        // any particular value is supported.
+        try {
+          const capabilities = controls.streamVideoCapabilitiesGet?.(
+            (track) => [track]
+          ) as (MediaTrackCapabilities & { zoom?: { min: number; max: number } }) | undefined;
+          const zoomRange = capabilities?.zoom;
+          if (zoomRange) {
+            const zoom = zoomRange.min + (zoomRange.max - zoomRange.min) * 0.4;
+            controls.streamVideoConstraintsApply?.({
+              advanced: [{ zoom } as MediaTrackConstraintSet],
+            });
+          }
+        } catch {
+          // Zoom isn't universally supported — the crop-based fix still applies.
+        }
       })
       .catch(() => {
         setError(
@@ -134,11 +155,12 @@ export function BarcodeScanner({
           />
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div
-              className="rounded-lg border-2 border-green-500"
+              className="rounded-lg border-[3px] border-green-400"
               style={{
                 width: `${SCAN_REGION_WIDTH * 100}%`,
                 height: `${SCAN_REGION_HEIGHT * 100}%`,
-                boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.55)",
+                boxShadow:
+                  "0 0 0 9999px rgba(0, 0, 0, 0.55), 0 0 16px 2px rgba(74, 222, 128, 0.7)",
               }}
             />
           </div>

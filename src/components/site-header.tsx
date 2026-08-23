@@ -65,7 +65,7 @@ function CategoryDropdown({
     <div className="group relative">
       <Link
         href={`/products?category=${category}`}
-        className="hover-lift -mx-2.5 -my-1 rounded-full px-2.5 py-1 hover:-translate-y-0.5 hover:bg-accent/15 hover:text-accent"
+        className="hover-lift -mx-2.5 -my-1 rounded-full px-2.5 py-1 whitespace-nowrap hover:-translate-y-0.5 hover:bg-accent/15 hover:text-accent"
       >
         {label}
       </Link>
@@ -151,7 +151,7 @@ export async function SiteHeader() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="border-white bg-white text-black hover:bg-white/90"
+                  className="border-white bg-white text-black hover:bg-white/90 dark:bg-transparent dark:text-white dark:hover:bg-white/10"
                 >
                   {dict.auth.signUp}
                 </Button>
@@ -290,7 +290,7 @@ export async function SiteHeader() {
               <Link
                 key={category}
                 href={`/products?category=${category}`}
-                className="hover-lift -mx-2.5 -my-1 rounded-full px-2.5 py-1 hover:-translate-y-0.5 hover:bg-accent/15 hover:text-accent"
+                className="hover-lift -mx-2.5 -my-1 rounded-full px-2.5 py-1 whitespace-nowrap hover:-translate-y-0.5 hover:bg-accent/15 hover:text-accent"
               >
                 {dict.categories[category]}
               </Link>
