@@ -15,6 +15,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Barcode } from "@/components/barcode";
+import { ProductImage } from "@/components/product-image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -54,6 +55,7 @@ type AdminProduct = {
   isActive: boolean;
   sold: number;
   revenue: number;
+  images: string[];
   variants: { id: string; barcode: string | null; stock: number }[];
 };
 
@@ -242,9 +244,14 @@ export function AdminProductsTable({ products }: { products: AdminProduct[] }) {
                 >
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-3">
-                      <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-accent/20 via-accent/5 to-brand/10">
-                        <Icon className="size-5 text-muted-foreground" strokeWidth={1.25} />
-                      </div>
+                      <ProductImage
+                        src={product.images[0]}
+                        alt={product.name}
+                        icon={Icon}
+                        className="size-11 shrink-0 rounded-lg"
+                        iconClassName="size-5"
+                        sizes="44px"
+                      />
                       {product.name}
                     </div>
                   </TableCell>

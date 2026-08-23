@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { Prisma } from "@/generated/prisma/client";
+import { cloudinary, CLOUDINARY_PRODUCT_FOLDER, isCloudinaryConfigured } from "@/lib/cloudinary";
 import { SOLD_ORDER_STATUSES } from "@/lib/order-status";
 import { AGE_GROUPS, PRODUCT_CATEGORIES } from "@/lib/product-category";
 import { adminProcedure, publicProcedure, router } from "@/server/trpc";
@@ -29,6 +30,22 @@ function requireBarcodeWhenStocked<T extends { stock: number; barcode?: string }
 }
 const BARCODE_REQUIRED_MESSAGE =
   "Every variant you're stocking needs a barcode — scan or enter one.";
+
+// Turns a raw P2002 (unique constraint) failure into a message an admin can
+// actually act on, instead of the default "Invalid `prisma.product.create()`
+// invocation: ..." leaking straight to the toast.
+function friendlyUniqueConstraintMessage(err: Prisma.PrismaClientKnownRequestError): string {
+  const target = Array.isArray(err.meta?.target)
+    ? err.meta.target.join(",")
+    : String(err.meta?.target ?? "");
+  if (target.includes("barcode")) {
+    return "That barcode is already used by another product variant — scan a different one or check whether this item already exists.";
+  }
+  if (target.includes("slug")) {
+    return "That slug is already used by another product — choose a different one.";
+  }
+  return "This conflicts with an existing product.";
+}
 
 // costPrice is deliberately omitted from every query below except the two
 // PIN-gated reveal procedures at the bottom of this router — it's never
@@ -166,6 +183,7 @@ export const productRouter = router({
         costPrice: z.number().nonnegative().optional(),
         basePrice: z.number().positive(),
         salePrice: z.number().positive().optional(),
+        images: z.array(z.string()).default([]),
         variants: z.array(variantUpdateInput).default([]),
       })
     )
@@ -225,15 +243,20 @@ export const productRouter = router({
           });
         });
       } catch (err) {
-        if (
-          err instanceof Prisma.PrismaClientKnownRequestError &&
-          err.code === "P2003"
-        ) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message:
-              "Can't remove a variant that already has order history — set its stock to 0 instead.",
-          });
+        if (err instanceof Prisma.PrismaClientKnownRequestError) {
+          if (err.code === "P2003") {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message:
+                "Can't remove a variant that already has order history — set its stock to 0 instead.",
+            });
+          }
+          if (err.code === "P2002") {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: friendlyUniqueConstraintMessage(err),
+            });
+          }
         }
         throw err;
       }
@@ -255,32 +278,68 @@ export const productRouter = router({
         variants: z.array(variantInput).default([]),
       })
     )
-    .mutation(({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       const { variants, ...productData } = input;
 
       if (!requireBarcodeWhenStocked(variants)) {
         throw new TRPCError({ code: "BAD_REQUEST", message: BARCODE_REQUIRED_MESSAGE });
       }
 
-      return ctx.prisma.product.create({
-        data: {
-          ...productData,
-          variants: {
-            create: variants.map((variant, index) => ({
-              sku: `${input.slug.toUpperCase()}-${index + 1}-${crypto
-                .randomUUID()
-                .slice(0, 6)
-                .toUpperCase()}`,
-              size: variant.size || undefined,
-              color: variant.color || undefined,
-              stock: variant.stock,
-              barcode: variant.barcode || undefined,
-            })),
+      try {
+        return await ctx.prisma.product.create({
+          data: {
+            ...productData,
+            variants: {
+              create: variants.map((variant, index) => ({
+                sku: `${input.slug.toUpperCase()}-${index + 1}-${crypto
+                  .randomUUID()
+                  .slice(0, 6)
+                  .toUpperCase()}`,
+                size: variant.size || undefined,
+                color: variant.color || undefined,
+                stock: variant.stock,
+                barcode: variant.barcode || undefined,
+              })),
+            },
           },
-        },
-        include: { variants: true },
-      });
+          include: { variants: true },
+        });
+      } catch (err) {
+        if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: friendlyUniqueConstraintMessage(err),
+          });
+        }
+        throw err;
+      }
     }),
+
+  // Signs a direct-to-Cloudinary upload so the admin's browser can POST the
+  // image file straight to Cloudinary (no routing large image bytes through
+  // our own serverless function / its request-body limit). The API secret
+  // never leaves the server — only the resulting signature does.
+  imageUploadSignature: adminProcedure.mutation(() => {
+    if (!isCloudinaryConfigured()) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Cloudinary isn't configured — set CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET.",
+      });
+    }
+    const timestamp = Math.round(Date.now() / 1000);
+    const paramsToSign = { timestamp, folder: CLOUDINARY_PRODUCT_FOLDER };
+    const signature = cloudinary.utils.api_sign_request(
+      paramsToSign,
+      process.env.CLOUDINARY_API_SECRET!
+    );
+    return {
+      timestamp,
+      folder: CLOUDINARY_PRODUCT_FOLDER,
+      signature,
+      apiKey: process.env.CLOUDINARY_API_KEY!,
+      cloudName: process.env.CLOUDINARY_CLOUD_NAME!,
+    };
+  }),
 
   // PIN check happens here, not client-side — costPrice is never sent to
   // the browser until this returns successfully, so there's nothing to

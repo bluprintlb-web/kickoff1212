@@ -1,8 +1,9 @@
 "use client";
 
-import { Lock, Unlock } from "lucide-react";
+import { Lock, Unlock, X } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { BarcodeScanner } from "@/components/barcode-scanner";
 import { Button } from "@/components/ui/button";
@@ -86,6 +87,7 @@ export type ProductFormInitialData = {
   ageGroup: (typeof AGE_GROUPS)[number] | null;
   basePrice: string;
   salePrice: string | null;
+  images: string[];
   variants: {
     id: string;
     size: string | null;
@@ -126,6 +128,41 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
   );
   const [basePrice, setBasePrice] = useState(initial?.basePrice ?? "");
   const [salePrice, setSalePrice] = useState(initial?.salePrice ?? "");
+  const [images, setImages] = useState<string[]>(initial?.images ?? []);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const getUploadSignature = trpc.product.imageUploadSignature.useMutation();
+
+  async function handleFilesSelected(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const signature = await getUploadSignature.mutateAsync();
+      const uploaded: string[] = [];
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("api_key", signature.apiKey);
+        formData.append("timestamp", String(signature.timestamp));
+        formData.append("signature", signature.signature);
+        formData.append("folder", signature.folder);
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${signature.cloudName}/image/upload`,
+          { method: "POST", body: formData }
+        );
+        if (!res.ok) throw new Error("Upload failed");
+        const data = (await res.json()) as { secure_url: string };
+        uploaded.push(data.secure_url);
+      }
+      setImages((prev) => [...prev, ...uploaded]);
+    } catch {
+      toast.error("Photo upload failed — check your connection and try again.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  }
+
   const initialVariantRows: VariantRow[] = initial?.variants.length
     ? initial.variants.map((v) => ({
         clientId: crypto.randomUUID(),
@@ -226,6 +263,17 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
       return;
     }
 
+    const barcodes = variantInput.map((row) => row.barcode).filter(Boolean);
+    const duplicateBarcode = barcodes.find(
+      (code, index) => barcodes.indexOf(code) !== index
+    );
+    if (duplicateBarcode) {
+      toast.error(
+        `Barcode ${duplicateBarcode} is entered on more than one size — each needs its own.`
+      );
+      return;
+    }
+
     const shared = {
       name,
       nameAr: nameAr || undefined,
@@ -237,6 +285,7 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
       // Only send costPrice if the admin actually unlocked (and possibly
       // edited) it this session — otherwise leave it untouched server-side.
       costPrice: costUnlocked && costPrice ? Number(costPrice) : undefined,
+      images,
       variants: variantInput,
     };
 
@@ -289,6 +338,44 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
                 setSlug(e.target.value);
               }}
               required
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label>Photos</Label>
+            <div className="flex flex-wrap gap-3">
+              {images.map((url) => (
+                <div
+                  key={url}
+                  className="group relative size-24 overflow-hidden rounded-md border"
+                >
+                  <Image src={url} alt="" fill sizes="96px" className="object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setImages((prev) => prev.filter((u) => u !== url))}
+                    className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                    aria-label="Remove photo"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="flex size-24 flex-col items-center justify-center gap-1 rounded-md border border-dashed text-xs text-muted-foreground transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+              >
+                {uploading ? "Uploading…" : "Add photo"}
+              </button>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => handleFilesSelected(e.target.files)}
             />
           </div>
 

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { AddToCart } from "@/components/add-to-cart";
+import { ProductImage } from "@/components/product-image";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
 import { formatLBP } from "@/lib/currency";
 import { dictionaries, t } from "@/lib/i18n/dictionaries";
@@ -26,9 +27,14 @@ export default async function ProductPage({
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-4 py-16 sm:flex-row sm:gap-12">
-      <div className="flex aspect-square w-full shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 via-accent/5 to-brand/10 sm:w-96">
-        <Icon className="size-24 text-muted-foreground" strokeWidth={1.25} />
-      </div>
+      <ProductImage
+        src={product.images[0]}
+        alt={productName(product, locale)}
+        icon={Icon}
+        className="aspect-square w-full shrink-0 rounded-xl sm:w-96"
+        iconClassName="size-24"
+        sizes="(max-width: 640px) 100vw, 384px"
+      />
 
       <div className="flex flex-1 flex-col gap-4">
         <span className="w-fit rounded-full bg-accent/15 px-2 py-0.5 text-xs font-medium tracking-wide text-accent-foreground uppercase">

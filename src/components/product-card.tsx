@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ProductImage } from "@/components/product-image";
 import { Card, CardContent } from "@/components/ui/card";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
 import { formatLBP } from "@/lib/currency";
@@ -19,6 +20,7 @@ export function ProductCard({
     basePrice: { toString(): string };
     salePrice?: { toString(): string } | null;
     variants?: { size: string | null; stock: number }[];
+    images?: string[];
   };
   index?: number;
   locale: Locale;
@@ -41,12 +43,14 @@ export function ProductCard({
       style={{ animationDelay: `${index * 60}ms`, animationFillMode: "both" }}
     >
       <Card className="hover-lift h-full gap-0 py-0 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/20 hover:ring-1 hover:ring-accent/40">
-        <div className="flex aspect-square items-center justify-center overflow-hidden bg-gradient-to-br from-accent/20 via-accent/5 to-brand/10">
-          <Icon
-            className="hover-lift size-14 text-muted-foreground group-hover/card:scale-110 group-hover/card:rotate-3"
-            strokeWidth={1.25}
-          />
-        </div>
+        <ProductImage
+          src={product.images?.[0]}
+          alt={productName(product, locale)}
+          icon={Icon}
+          className="aspect-square"
+          iconClassName="hover-lift size-14 group-hover/card:scale-110 group-hover/card:rotate-3"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+        />
         <CardContent className="flex flex-col gap-1.5 pt-3 pb-4">
           <span className="w-fit rounded-full bg-accent/15 px-2 py-0.5 text-[11px] font-medium tracking-wide text-accent-foreground uppercase">
             {dict.categories[product.category]}
