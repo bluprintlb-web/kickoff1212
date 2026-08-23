@@ -221,6 +221,11 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
         barcode: row.barcode || undefined,
       }));
 
+    if (variantInput.some((row) => row.stock > 0 && !row.barcode)) {
+      toast.error("Every variant you're stocking needs a barcode — scan or enter one.");
+      return;
+    }
+
     const shared = {
       name,
       nameAr: nameAr || undefined,

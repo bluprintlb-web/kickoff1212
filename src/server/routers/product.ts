@@ -19,6 +19,17 @@ const variantUpdateInput = variantInput.extend({
   id: z.string().optional(),
 });
 
+// A variant actually being stocked (stock > 0) must be scannable at POS —
+// no silently-unsellable inventory. A size left at 0 (not carried) doesn't
+// need one yet.
+function requireBarcodeWhenStocked<T extends { stock: number; barcode?: string }>(
+  variants: T[]
+) {
+  return variants.every((v) => v.stock === 0 || Boolean(v.barcode?.trim()));
+}
+const BARCODE_REQUIRED_MESSAGE =
+  "Every variant you're stocking needs a barcode — scan or enter one.";
+
 // costPrice is deliberately omitted from every query below except the two
 // PIN-gated reveal procedures at the bottom of this router — it's never
 // sent to the client (storefront or admin) until the PIN is verified.
@@ -161,6 +172,10 @@ export const productRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { id, variants, ...productData } = input;
 
+      if (!requireBarcodeWhenStocked(variants)) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: BARCODE_REQUIRED_MESSAGE });
+      }
+
       const existing = await ctx.prisma.productVariant.findMany({
         where: { productId: id },
         select: { id: true },
@@ -242,6 +257,10 @@ export const productRouter = router({
     )
     .mutation(({ ctx, input }) => {
       const { variants, ...productData } = input;
+
+      if (!requireBarcodeWhenStocked(variants)) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: BARCODE_REQUIRED_MESSAGE });
+      }
 
       return ctx.prisma.product.create({
         data: {
