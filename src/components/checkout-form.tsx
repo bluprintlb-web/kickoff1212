@@ -142,7 +142,7 @@ export function CheckoutForm({ locale }: { locale: Locale }) {
                   type="button"
                   onClick={() => setPaymentMethod(method.value)}
                   className={cn(
-                    "rounded-full border px-4 py-1.5 text-sm font-medium transition-all duration-200",
+                    "hover-lift rounded-full border px-4 py-1.5 text-sm font-medium",
                     paymentMethod === method.value
                       ? "border-primary bg-primary text-primary-foreground"
                       : "border-border text-muted-foreground hover:scale-105 hover:text-foreground"

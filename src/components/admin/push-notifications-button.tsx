@@ -4,7 +4,7 @@ import { Bell, BellOff, BellRing } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { usePushSubscription } from "@/components/admin/use-push-subscription";
 
-export function PushNotificationsButton() {
+export function PushNotificationsButton({ className }: { className?: string }) {
   const { status, enable, disable, isPending } = usePushSubscription();
 
   if (status === "unsupported" || status === "checking") return null;
@@ -15,6 +15,7 @@ export function PushNotificationsButton() {
         type="button"
         variant="outline"
         size="sm"
+        className={className}
         disabled
         title="Notifications are blocked for this site in your browser settings — re-enable them there, then reload."
       >
@@ -30,6 +31,7 @@ export function PushNotificationsButton() {
         type="button"
         variant="outline"
         size="sm"
+        className={className}
         onClick={disable}
         disabled={isPending}
         title="Order notifications are on for this device — tap to turn off"
@@ -45,6 +47,7 @@ export function PushNotificationsButton() {
       type="button"
       variant="outline"
       size="sm"
+      className={className}
       onClick={enable}
       disabled={isPending}
       title="Enable order alerts"

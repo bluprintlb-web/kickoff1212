@@ -26,7 +26,7 @@ type MenuNode = {
 };
 
 const dropdownRowClass =
-  "flex items-center justify-between gap-3 px-3 py-2 text-xs font-normal tracking-normal whitespace-nowrap uppercase transition-colors hover:bg-slate-100 hover:text-slate-900";
+  "hover-lift flex items-center justify-between gap-3 px-3 py-2 text-xs font-normal tracking-normal whitespace-nowrap uppercase hover:bg-accent/15 hover:text-accent-foreground";
 
 function DropdownRow({ node }: { node: MenuNode }) {
   if (!node.children?.length) {
@@ -43,7 +43,7 @@ function DropdownRow({ node }: { node: MenuNode }) {
         {node.label}
         <ChevronRight className="size-3 shrink-0 opacity-50 rtl:rotate-180" />
       </Link>
-      <div className="invisible absolute top-0 start-full z-30 w-44 rounded-md border border-black/10 bg-white py-1 text-slate-700 opacity-0 shadow-lg transition-all duration-150 group-hover/item:visible group-hover/item:opacity-100">
+      <div className="hover-lift invisible absolute top-0 start-full z-30 w-44 scale-95 rounded-md border border-border bg-popover py-1 text-popover-foreground opacity-0 shadow-lg group-hover/item:visible group-hover/item:scale-100 group-hover/item:opacity-100">
         {node.children.map((child) => (
           <DropdownRow key={child.href} node={child} />
         ))}
@@ -65,11 +65,11 @@ function CategoryDropdown({
     <div className="group relative">
       <Link
         href={`/products?category=${category}`}
-        className="hover-underline transition-colors hover:text-accent"
+        className="hover-lift -mx-2.5 -my-1 rounded-full px-2.5 py-1 hover:-translate-y-0.5 hover:bg-accent/15 hover:text-accent"
       >
         {label}
       </Link>
-      <div className="invisible absolute top-full start-0 z-20 w-48 rounded-md border border-black/10 bg-white py-1 text-slate-700 opacity-0 shadow-lg transition-all duration-150 group-hover:visible group-hover:opacity-100">
+      <div className="hover-lift invisible absolute top-full start-0 z-20 w-48 origin-top -translate-y-1 scale-95 rounded-md border border-border bg-popover py-1 text-popover-foreground opacity-0 shadow-lg group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
         {items.map((item) => (
           <DropdownRow key={item.href} node={item} />
         ))}
@@ -107,13 +107,13 @@ export async function SiteHeader() {
             isAdmin={session?.user?.role === "ADMIN"}
           />
           <Link href="/" className="text-surface-brand-foreground">
-            <Logo />
+            <Logo size="lg" />
           </Link>
         </div>
-        <nav className="flex flex-wrap items-center gap-2 text-sm text-surface-brand-foreground/75 sm:gap-4">
+        <nav className="flex flex-wrap items-center gap-2 text-base font-medium text-surface-brand-foreground/75 sm:gap-4">
           <Link
             href="/products"
-            className="hover-underline transition-colors hover:text-accent"
+            className="hidden hover-underline hover-lift hover:text-accent sm:inline"
           >
             {dict.nav.shop}
           </Link>
@@ -129,16 +129,16 @@ export async function SiteHeader() {
           />
           <LanguageToggle
             locale={locale}
-            className="border-white/15 bg-white/5 text-surface-brand-foreground"
+            className="hidden border-white/15 bg-white/5 text-surface-brand-foreground sm:flex"
           />
           <ThemeToggle
             labels={dict.themeToggle}
             locale={locale}
-            className="border-white/15 bg-white/5 text-surface-brand-foreground"
+            className="hidden border-white/15 bg-white/5 text-surface-brand-foreground sm:flex"
           />
           {!session?.user && (
             <>
-              <Link href="/login">
+              <Link href="/login" className="hidden sm:inline-block">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -147,7 +147,7 @@ export async function SiteHeader() {
                   {dict.nav.logIn}
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href="/register" className="hidden sm:inline-block">
                 <Button
                   variant="outline"
                   size="sm"
@@ -290,7 +290,7 @@ export async function SiteHeader() {
               <Link
                 key={category}
                 href={`/products?category=${category}`}
-                className="hover-underline transition-colors hover:text-accent"
+                className="hover-lift -mx-2.5 -my-1 rounded-full px-2.5 py-1 hover:-translate-y-0.5 hover:bg-accent/15 hover:text-accent"
               >
                 {dict.categories[category]}
               </Link>

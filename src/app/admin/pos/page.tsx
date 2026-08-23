@@ -132,7 +132,7 @@ export default function PosPage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Sell (POS)</h1>
+        <h1 className="font-display text-3xl tracking-wide">Sell (POS)</h1>
         <Button variant="default" size="lg" onClick={() => setScannerOpen(true)}>
           <ScanLine className="size-4" />
           Scan item
@@ -234,7 +234,7 @@ export default function PosPage() {
             </span>
           </span>
           <Button
-            variant="default"
+            variant="accent"
             size="lg"
             disabled={lines.length === 0 || completeSale.isPending}
             onClick={() =>

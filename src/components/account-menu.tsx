@@ -6,6 +6,7 @@ import {
   LogIn,
   LogOut,
   Menu,
+  ShoppingBag,
   User,
   UserPlus,
   X,
@@ -13,13 +14,15 @@ import {
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { logout } from "@/app/actions/auth";
+import { LanguageToggle } from "@/components/language-toggle";
 import { Logo } from "@/components/logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { dictionaries, type Locale } from "@/lib/i18n/dictionaries";
 import { cn } from "@/lib/utils";
 
 const rowClass =
-  "flex items-center gap-3 rounded-lg px-3 py-3 text-start text-sm font-medium text-popover-foreground transition-all duration-200 hover:translate-x-1 hover:bg-muted rtl:hover:-translate-x-1";
+  "hover-lift flex items-center gap-3 rounded-lg px-3 py-3 text-start text-sm font-medium text-popover-foreground hover:translate-x-1 hover:bg-muted rtl:hover:-translate-x-1";
 
 // The hamburger sits at the header's start (next to the logo) — left in
 // English, right in Arabic, same as everything else that mirrors with the
@@ -63,7 +66,7 @@ export function AccountMenu({
     <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
       <DialogPrimitive.Trigger
         aria-label={dict.nav.menu}
-        className="flex items-center transition-all duration-200 hover:scale-110 hover:text-accent"
+        className="hover-lift flex items-center hover:scale-110 hover:text-accent"
       >
         <Menu className="size-5" />
       </DialogPrimitive.Trigger>
@@ -82,6 +85,19 @@ export function AccountMenu({
           </div>
 
           <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+            <Link
+              href="/products"
+              className={cn(rowClass, "sm:hidden")}
+              onClick={() => setOpen(false)}
+            >
+              <ShoppingBag className="size-4.5 shrink-0" />
+              {dict.nav.shop}
+            </Link>
+            <div className="flex items-center justify-between gap-2 px-3 py-2 sm:hidden">
+              <LanguageToggle locale={locale} />
+              <ThemeToggle labels={dict.themeToggle} locale={locale} />
+            </div>
+            <div className="my-1 border-t sm:hidden" />
             {isLoggedIn ? (
               <>
                 <Link

@@ -69,7 +69,7 @@ export function LanguageToggle({
           onClick={() => handleSelect(option.value)}
           aria-pressed={active === option.value}
           className={cn(
-            "relative z-10 w-9 rounded-full py-1 text-center text-xs font-semibold transition-all duration-200",
+            "hover-lift relative z-10 w-9 rounded-full py-1 text-center text-xs font-semibold",
             active === option.value
               ? "opacity-100"
               : "opacity-70 hover:scale-110 hover:opacity-100"

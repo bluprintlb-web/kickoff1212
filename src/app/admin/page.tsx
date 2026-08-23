@@ -17,7 +17,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold">Admin dashboard</h1>
+        <h1 className="font-display text-3xl tracking-wide">Admin dashboard</h1>
         <p className="text-muted-foreground">
           Manage products, orders, and stock from here.
         </p>

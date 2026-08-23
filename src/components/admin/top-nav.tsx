@@ -27,8 +27,8 @@ export function AdminTopNav() {
             className={cn(
               "flex shrink-0 items-center gap-2 border-b-2 px-2.5 py-4 text-sm font-medium whitespace-nowrap transition-all duration-200 sm:px-3",
               active
-                ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:-translate-y-0.5 hover:border-border hover:text-foreground"
+                ? "border-accent text-accent"
+                : "border-transparent text-surface-brand-foreground/60 hover:-translate-y-0.5 hover:border-white/20 hover:text-surface-brand-foreground"
             )}
           >
             <Icon className="size-4" />

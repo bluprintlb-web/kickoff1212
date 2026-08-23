@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Jersey_15 } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { ReloadHomeRedirect } from "@/components/reload-home-redirect";
@@ -16,6 +16,16 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+// Chunky pixel/scoreboard-style display face for the wordmark and big
+// homepage headlines only (see globals.css's --font-display) — a thematic
+// fit for a jersey brand, not swapped in for --font-heading site-wide since
+// that would also hit Card/Dialog titles across checkout, admin, etc.
+const jerseyDisplay = Jersey_15({
+  variable: "--font-jersey",
+  weight: "400",
   subsets: ["latin"],
 });
 
@@ -89,7 +99,7 @@ export default async function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full overflow-x-hidden antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${jerseyDisplay.variable} h-full overflow-x-hidden antialiased`}
     >
       <body className="flex min-h-full flex-col overflow-x-hidden">
         <Script id="theme-init" strategy="beforeInteractive">
@@ -113,7 +123,7 @@ export default async function RootLayout({
                 className="h-full w-full object-contain"
               />
             </div>
-            <p className="relative mt-5 text-3xl font-bold tracking-[0.2em] text-slate-100 sm:text-4xl">
+            <p className="font-display relative mt-5 text-4xl tracking-[0.15em] text-slate-100 sm:text-5xl">
               KICK <span className="text-accent">OFF</span>
             </p>
             <p className="relative mt-1 text-[11px] tracking-[0.25em] text-slate-500 uppercase">

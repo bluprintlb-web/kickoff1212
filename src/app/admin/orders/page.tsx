@@ -12,7 +12,7 @@ export default async function AdminOrdersPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold">Orders</h1>
+        <h1 className="font-display text-3xl tracking-wide">Orders</h1>
         <p className="text-muted-foreground">
           Track order status and monthly profit.
         </p>

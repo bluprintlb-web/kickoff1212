@@ -71,7 +71,7 @@ export function AddToCart({
                   disabled={outOfStock}
                   onClick={() => setVariantId(variant.id)}
                   className={cn(
-                    "rounded-full border px-4 py-1.5 text-sm font-medium transition-all duration-200",
+                    "hover-lift rounded-full border px-4 py-1.5 text-sm font-medium",
                     outOfStock
                       ? "cursor-not-allowed border-border text-muted-foreground/40 line-through"
                       : variantId === variant.id

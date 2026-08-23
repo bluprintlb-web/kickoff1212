@@ -40,10 +40,10 @@ export function ProductCard({
       className="animate-in fade-in slide-in-from-bottom-2 duration-500"
       style={{ animationDelay: `${index * 60}ms`, animationFillMode: "both" }}
     >
-      <Card className="h-full gap-0 py-0 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:ring-1 hover:ring-accent/40">
+      <Card className="hover-lift h-full gap-0 py-0 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/20 hover:ring-1 hover:ring-accent/40">
         <div className="flex aspect-square items-center justify-center overflow-hidden bg-gradient-to-br from-accent/20 via-accent/5 to-brand/10">
           <Icon
-            className="size-14 text-muted-foreground transition-transform duration-300 group-hover/card:scale-110"
+            className="hover-lift size-14 text-muted-foreground group-hover/card:scale-110 group-hover/card:rotate-3"
             strokeWidth={1.25}
           />
         </div>

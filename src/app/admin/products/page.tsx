@@ -11,14 +11,14 @@ export default async function AdminProductsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Products</h1>
+          <h1 className="font-display text-3xl tracking-wide">Products</h1>
           <p className="text-sm text-muted-foreground">
             {products.length} product{products.length === 1 ? "" : "s"} in
             your catalog.
           </p>
         </div>
         <Link href="/admin/products/new">
-          <Button variant="default">New product</Button>
+          <Button variant="accent">New product</Button>
         </Link>
       </div>
 

@@ -244,7 +244,9 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">{isEditing ? "Edit product" : "New product"}</h1>
+      <h1 className="font-display text-3xl tracking-wide">
+        {isEditing ? "Edit product" : "New product"}
+      </h1>
 
       <Card className="max-w-2xl px-6">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -492,7 +494,7 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
             ))}
           </div>
 
-          <Button type="submit" variant="default" disabled={pending}>
+          <Button type="submit" variant="accent" disabled={pending}>
             {pending
               ? isEditing
                 ? "Saving..."

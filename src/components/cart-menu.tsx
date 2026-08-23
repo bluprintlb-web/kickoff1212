@@ -66,7 +66,7 @@ export function CartMenu({
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger
-        className="relative flex items-center transition-all duration-200 hover:scale-110 hover:text-accent"
+        className="hover-lift relative flex items-center hover:scale-110 hover:text-accent"
         aria-label="Cart"
       >
         <ShoppingCart className="size-5" />

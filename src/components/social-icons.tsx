@@ -119,7 +119,7 @@ export function SocialLinks({
             rel="noopener noreferrer"
             aria-label={iconLabel}
             className={cn(
-              "inline-flex transition-all duration-200 hover:scale-110 hover:text-accent",
+              "hover-lift inline-flex hover:scale-110 hover:text-accent",
               variant === "circle" &&
                 "size-7 items-center justify-center rounded-full border border-current/25 hover:border-accent"
             )}

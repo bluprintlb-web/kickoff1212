@@ -10,6 +10,10 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
+  /* Chunky pixel/scoreboard face — used explicitly via `font-display` on
+     the wordmark and big homepage headlines only, not aliased into
+     --font-heading (which also drives Card/Dialog titles site-wide). */
+  --font-display: var(--font-jersey);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -230,6 +234,35 @@ html[data-hide-splash="1"] #app-splash {
   .hover-underline:hover::after {
     transform: scaleX(1);
   }
+
+  /* Premium hover motion (2026-08-20 polish pass): a slight spring/
+     overshoot on the transform properties (translate/scale/rotate) reads
+     as more alive than a flat ease, while box-shadow/color stay on a
+     plain smooth curve — an overshoot on color would visibly overshoot
+     the target hue/alpha and read as a flicker, not a bounce. One
+     reusable class (same idea as .hover-underline above) instead of
+     duplicating this multi-property `transition` shorthand everywhere.
+     Deliberately a plain component-layer class, not a `transition-*`
+     Tailwind utility — a consumer passing a conflicting `transition-*`
+     className (e.g. `transition-transform`) can never silently strip it
+     via tailwind-merge, which is exactly what broke the homepage hero
+     buttons before this pass (see CONTEXT_HANDOFF.md, 2026-08-20).
+     Pair with real `hover:` utilities for the actual target values, e.g.
+     `hover-lift hover:-translate-y-1 hover:scale-105 hover:shadow-lg`. */
+  .hover-lift {
+    transition-property: translate, scale, rotate, box-shadow,
+      background-color, color, border-color, opacity;
+    transition-duration: 380ms, 380ms, 380ms, 300ms, 180ms, 180ms, 180ms, 180ms;
+    transition-timing-function:
+      cubic-bezier(0.34, 1.56, 0.64, 1),
+      cubic-bezier(0.34, 1.56, 0.64, 1),
+      cubic-bezier(0.34, 1.56, 0.64, 1),
+      cubic-bezier(0.16, 1, 0.3, 1),
+      cubic-bezier(0.4, 0, 0.2, 1),
+      cubic-bezier(0.4, 0, 0.2, 1),
+      cubic-bezier(0.4, 0, 0.2, 1),
+      cubic-bezier(0.4, 0, 0.2, 1);
+  }
 }
 
 @keyframes kickoff-icon-bounce {
@@ -247,17 +280,33 @@ html[data-hide-splash="1"] #app-splash {
 
 /* Campaign banner decorative motifs (see src/lib/football-events.ts /
    src/components/campaign-banner.tsx) — small, subtle, never covering the
-   banner text (kept low-opacity and confined to the bar's own height). */
+   banner text (kept low-opacity and confined to the bar's own height).
+   Rewritten (2026-08-20) from blunt 2-3 keyframe snaps to genuinely floaty,
+   multi-step motion — real drifting things wander side to side as they
+   move, not in a straight line, so every motif now combines a vertical
+   path with a gentle horizontal sway and rotation. Each keeps its own
+   distinct character on purpose (snow still falls, stars still twinkle,
+   the shield still bobs) — only the *quality* of the motion changed. */
 @keyframes kickoff-motif-fall {
   0% {
-    transform: translateY(-140%) rotate(0deg);
+    transform: translate(0, -140%) rotate(0deg);
     opacity: 0;
   }
-  15% {
+  12% {
     opacity: 0.9;
   }
+  30% {
+    transform: translate(8px, -70%) rotate(65deg);
+  }
+  55% {
+    transform: translate(-7px, 15%) rotate(140deg);
+  }
+  80% {
+    transform: translate(6px, 170%) rotate(210deg);
+    opacity: 0.7;
+  }
   100% {
-    transform: translateY(240%) rotate(200deg);
+    transform: translate(0, 240%) rotate(260deg);
     opacity: 0;
   }
 }
@@ -266,22 +315,38 @@ html[data-hide-splash="1"] #app-splash {
   0%,
   100% {
     opacity: 0.25;
-    transform: scale(0.75);
+    transform: translateY(0) rotate(0deg) scale(0.75);
+  }
+  25% {
+    opacity: 0.65;
+    transform: translateY(-3px) rotate(10deg) scale(0.95);
   }
   50% {
     opacity: 1;
-    transform: scale(1.15);
+    transform: translateY(-6px) rotate(0deg) scale(1.15);
+  }
+  75% {
+    opacity: 0.65;
+    transform: translateY(-3px) rotate(-10deg) scale(0.95);
   }
 }
 
 @keyframes kickoff-motif-bounce {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translate(0, 0) rotate(0deg);
     opacity: 0.6;
   }
+  25% {
+    transform: translate(2px, -6px) rotate(5deg);
+    opacity: 0.85;
+  }
   50% {
-    transform: translateY(-5px);
+    transform: translate(-2px, -11px) rotate(-4deg);
     opacity: 1;
+  }
+  75% {
+    transform: translate(-1px, -5px) rotate(3deg);
+    opacity: 0.85;
   }
 }

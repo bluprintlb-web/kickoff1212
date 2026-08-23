@@ -1,11 +1,8 @@
+import { CampaignIcon } from "@/components/campaign-icon";
 import { CampaignMotifs } from "@/components/campaign-motifs";
 import { getActiveCampaign } from "@/lib/football-events";
 import { dictionaries, type Locale } from "@/lib/i18n/dictionaries";
-import {
-  BANNER_MOTIF_SLOTS,
-  CAMPAIGN_COPY_KEY,
-  CAMPAIGN_ICON,
-} from "@/lib/campaign-visuals";
+import { BANNER_MOTIF_SLOTS, CAMPAIGN_COPY_KEY } from "@/lib/campaign-visuals";
 
 // Whenever a known football event/holiday is active (see
 // src/lib/football-events.ts), the storefront's top strip themes itself
@@ -19,13 +16,12 @@ export function CampaignBanner({ locale }: { locale: Locale }) {
 
   if (!campaign) {
     return (
-      <div className="bg-secondary px-4 py-2 text-center text-xs font-medium tracking-wide text-secondary-foreground">
+      <div className="bg-surface-brand px-4 py-2 text-center text-xs font-medium tracking-wide text-surface-brand-foreground">
         {dict.promoBar}
       </div>
     );
   }
 
-  const Icon = CAMPAIGN_ICON[campaign.id];
   const copy = dict.campaigns[CAMPAIGN_COPY_KEY[campaign.id]];
 
   return (
@@ -35,7 +31,7 @@ export function CampaignBanner({ locale }: { locale: Locale }) {
     >
       <CampaignMotifs campaign={campaign} slots={BANNER_MOTIF_SLOTS} />
       <span className="relative inline-flex items-center gap-1.5">
-        <Icon className="size-3.5 shrink-0" />
+        <CampaignIcon campaignId={campaign.id} className="size-5 shrink-0" />
         {copy}
       </span>
     </div>

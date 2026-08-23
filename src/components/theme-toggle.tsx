@@ -88,7 +88,7 @@ export function ThemeToggle({
         aria-pressed={active === "light"}
         style={{ width: OPTION_WIDTH }}
         className={cn(
-          "relative z-10 flex items-center justify-center gap-1.5 rounded-full py-1 text-xs font-semibold transition-all duration-200",
+          "hover-lift relative z-10 flex items-center justify-center gap-1.5 rounded-full py-1 text-xs font-semibold",
           active === "light"
             ? "opacity-100"
             : "opacity-60 hover:scale-105 hover:opacity-90"
@@ -103,7 +103,7 @@ export function ThemeToggle({
         aria-pressed={active === "dark"}
         style={{ width: OPTION_WIDTH }}
         className={cn(
-          "relative z-10 flex items-center justify-center gap-1.5 rounded-full py-1 text-xs font-semibold transition-all duration-200",
+          "hover-lift relative z-10 flex items-center justify-center gap-1.5 rounded-full py-1 text-xs font-semibold",
           active === "dark"
             ? "opacity-100"
             : "opacity-60 hover:scale-105 hover:opacity-90"
