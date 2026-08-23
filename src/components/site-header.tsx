@@ -161,7 +161,7 @@ export async function SiteHeader() {
         </nav>
       </div>
       <div className="border-t border-white/10 bg-[color-mix(in_oklch,var(--surface-brand),black_15%)]">
-        <nav className="mx-auto flex max-w-6xl items-center gap-5 overflow-x-auto px-4 py-2 text-xs font-medium tracking-wide whitespace-nowrap text-surface-brand-foreground/65 uppercase sm:overflow-visible">
+        <nav className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2 text-xs font-medium tracking-wide text-surface-brand-foreground/65 uppercase sm:flex-nowrap sm:gap-5">
           {PRODUCT_CATEGORIES.map((category) => {
             if (category === "JERSEY") {
               return (

@@ -79,7 +79,7 @@ export function ThemeToggle({
     >
       <div
         aria-hidden
-        className="absolute top-0.5 bottom-0.5 start-0.5 rounded-full bg-white/15 transition-transform duration-300 ease-out"
+        className="absolute top-0.5 bottom-0.5 start-0.5 rounded-full bg-current/15 transition-transform duration-300 ease-out"
         style={{ width: OPTION_WIDTH, transform: `translateX(${active === "dark" ? OPTION_WIDTH * sign : 0}px)` }}
       />
       <button

@@ -1,13 +1,12 @@
 "use client";
 
 import {
-  Archive,
-  ArchiveRestore,
   ArrowUpDown,
   Lock,
   Pencil,
   Search,
   ShoppingBag,
+  Trash2,
   Unlock,
 } from "lucide-react";
 import Link from "next/link";
@@ -118,7 +117,7 @@ export function AdminProductsTable({ products }: { products: AdminProduct[] }) {
     setPinDialogOpen(true);
   }
 
-  const setActive = trpc.product.setActive.useMutation({
+  const deleteProduct = trpc.product.delete.useMutation({
     onSuccess: () => router.refresh(),
     onError: (error) => toast.error(error.message),
   });
@@ -147,15 +146,11 @@ export function AdminProductsTable({ products }: { products: AdminProduct[] }) {
     return rows;
   }, [products, search, category, sort]);
 
-  function toggleArchive(product: AdminProduct) {
-    const archiving = product.isActive;
-    if (
-      archiving &&
-      !window.confirm(`Archive "${product.name}"? It'll be hidden from the storefront.`)
-    ) {
+  function handleDelete(product: AdminProduct) {
+    if (!window.confirm(`Delete "${product.name}"? This can't be undone.`)) {
       return;
     }
-    setActive.mutate({ id: product.id, isActive: !product.isActive });
+    deleteProduct.mutate({ id: product.id });
   }
 
   return (
@@ -316,17 +311,13 @@ export function AdminProductsTable({ products }: { products: AdminProduct[] }) {
                       </Link>
                       <Button
                         type="button"
-                        variant={product.isActive ? "solid-destructive" : "solid-success"}
+                        variant="solid-destructive"
                         size="sm"
-                        onClick={() => toggleArchive(product)}
-                        disabled={setActive.isPending}
+                        onClick={() => handleDelete(product)}
+                        disabled={deleteProduct.isPending}
                       >
-                        {product.isActive ? (
-                          <Archive className="size-3.5" />
-                        ) : (
-                          <ArchiveRestore className="size-3.5" />
-                        )}
-                        {product.isActive ? "Archive" : "Restore"}
+                        <Trash2 className="size-3.5" />
+                        Delete
                       </Button>
                     </div>
                   </TableCell>

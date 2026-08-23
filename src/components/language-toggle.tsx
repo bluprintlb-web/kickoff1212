@@ -59,7 +59,7 @@ export function LanguageToggle({
     >
       <div
         aria-hidden
-        className="absolute top-0.5 bottom-0.5 start-0.5 w-9 rounded-full bg-white/15 transition-transform duration-300 ease-out"
+        className="absolute top-0.5 bottom-0.5 start-0.5 w-9 rounded-full bg-current/15 transition-transform duration-300 ease-out"
         style={{ transform: `translateX(${activeIndex * OPTION_WIDTH * sign}px)` }}
       />
       {OPTIONS.map((option) => (
