@@ -72,8 +72,8 @@ export function AccountMenu({
       </DialogPrimitive.Trigger>
 
       <DialogPrimitive.Portal container={container}>
-        <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-black/40 duration-200 data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0" />
-        <DialogPrimitive.Popup className="fixed inset-y-0 start-0 z-50 flex h-full w-72 max-w-[85vw] flex-col bg-popover text-popover-foreground shadow-2xl outline-none duration-300 data-open:animate-in data-open:slide-in-from-left data-open:rtl:slide-in-from-right data-closed:animate-out data-closed:slide-out-to-left data-closed:rtl:slide-out-to-right">
+        <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-black/40 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0" />
+        <DialogPrimitive.Popup className="fixed inset-y-0 start-0 z-50 flex h-full w-72 max-w-[85vw] flex-col bg-popover text-popover-foreground shadow-2xl outline-none transition-transform duration-300 ease-out data-ending-style:-translate-x-full data-starting-style:-translate-x-full rtl:data-ending-style:translate-x-full rtl:data-starting-style:translate-x-full">
           <div className="flex items-center justify-between border-b px-4 py-4">
             <Logo />
             <DialogPrimitive.Close
