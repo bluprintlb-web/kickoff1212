@@ -23,7 +23,7 @@ export function CampaignIcon({
         width={32}
         height={32}
         aria-hidden
-        className={cn("object-contain", className)}
+        className={cn("object-contain", logo.monochrome && "brightness-0 invert", className)}
       />
     );
   }

@@ -4,6 +4,7 @@ import {
   PersonStanding,
   Shield,
   Shirt,
+  SportShoe,
   Trophy,
   Volleyball,
   type LucideIcon,
@@ -18,4 +19,5 @@ export const CATEGORY_ICONS: Record<ProductCategoryValue, LucideIcon> = {
   BODYWEAR: PersonStanding,
   SHIN_PADS: Shield,
   SOCKS: Footprints,
+  BOOTS: SportShoe,
 };

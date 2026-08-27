@@ -43,7 +43,7 @@ function DropdownRow({ node }: { node: MenuNode }) {
         {node.label}
         <ChevronRight className="size-3 shrink-0 opacity-50 rtl:rotate-180" />
       </Link>
-      <div className="hover-lift invisible absolute top-0 start-full z-30 w-44 scale-95 rounded-md border border-border bg-popover py-1 text-popover-foreground opacity-0 shadow-lg group-hover/item:visible group-hover/item:scale-100 group-hover/item:opacity-100">
+      <div className="hover-lift pointer-events-none absolute top-0 start-full z-30 w-44 scale-95 rounded-md border border-border bg-popover py-1 text-popover-foreground opacity-0 shadow-lg group-hover/item:pointer-events-auto group-hover/item:scale-100 group-hover/item:opacity-100">
         {node.children.map((child) => (
           <DropdownRow key={child.href} node={child} />
         ))}
@@ -69,7 +69,7 @@ function CategoryDropdown({
       >
         {label}
       </Link>
-      <div className="hover-lift invisible absolute top-full start-0 z-20 w-48 origin-top -translate-y-1 scale-95 rounded-md border border-border bg-popover py-1 text-popover-foreground opacity-0 shadow-lg group-hover:visible group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
+      <div className="hover-lift pointer-events-none absolute top-full start-0 z-20 w-48 origin-top -translate-y-1 scale-95 rounded-md border border-border bg-popover py-1 text-popover-foreground opacity-0 shadow-lg group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100">
         {items.map((item) => (
           <DropdownRow key={item.href} node={item} />
         ))}
@@ -300,6 +300,25 @@ export async function SiteHeader() {
                       href: `/products?category=${category}&length=short`,
                       label: dict.socksMenu.short,
                       children: typeChildren("short"),
+                    },
+                  ]}
+                />
+              );
+            }
+            if (category === "BOOTS") {
+              return (
+                <CategoryDropdown
+                  key={category}
+                  category={category}
+                  label={dict.categories[category]}
+                  items={[
+                    {
+                      href: `/products?category=${category}&brand=nike`,
+                      label: dict.bootsMenu.nike,
+                    },
+                    {
+                      href: `/products?category=${category}&brand=adidas`,
+                      label: dict.bootsMenu.adidas,
                     },
                   ]}
                 />

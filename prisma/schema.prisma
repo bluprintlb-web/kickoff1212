@@ -111,12 +111,13 @@ enum ProductCategory {
   BODYWEAR
   SHIN_PADS
   SOCKS
+  BOOTS
 }
 
 // Determines which size list applies to this product's variants — see
-// src/lib/sizes.ts. Only meaningful for apparel-style categories (jerseys,
-// bodywear); leave unset for balls/trophies/gloves/etc, which don't use the
-// kids/mens size ladders.
+// src/lib/sizes.ts. Only meaningful for categories with a kids/mens size
+// ladder (jerseys, boots); leave unset for balls/trophies/gloves/bodywear/
+// shin pads/socks, which don't use it.
 enum AgeGroup {
   KIDS
   ADULT

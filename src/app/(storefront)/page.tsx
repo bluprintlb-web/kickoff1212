@@ -5,6 +5,7 @@ import {
   ShieldCheck,
   ShoppingBag,
   Shirt,
+  SportShoe,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,13 +26,12 @@ import { getLocale } from "@/lib/i18n/get-locale";
 import { trpcCaller } from "@/trpc/server";
 
 // Homepage marketing tiles (not the real 7-category catalog — see
-// CONTEXT_HANDOFF.md "Content scope" decision). "Boots" has no matching
-// real category yet, so it links to the unfiltered catalog instead of a
-// dead filter.
+// CONTEXT_HANDOFF.md "Content scope" decision). "Boots" is now a real
+// category (added 2026-08-26), so it links to its own filter like the rest.
 const ARCHIVE_CATEGORIES = [
   { key: "retroJerseys", icon: ShoppingBag, href: "/products?category=JERSEY" },
   { key: "trainingKits", icon: Shirt, href: "/products?category=JERSEY" },
-  { key: "boots", icon: Flag, href: "/products" },
+  { key: "boots", icon: SportShoe, href: "/products?category=BOOTS" },
   { key: "accessories", icon: Crown, href: "/products?category=BALL" },
 ] as const;
 

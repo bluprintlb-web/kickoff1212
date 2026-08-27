@@ -48,7 +48,11 @@ export function CampaignMotifs({
             alt=""
             width={64}
             height={64}
-            className={cn("absolute size-4 object-contain opacity-80", iconClassName)}
+            className={cn(
+              "absolute size-4 object-contain opacity-80",
+              logo.monochrome && "brightness-0 invert",
+              iconClassName
+            )}
             style={style}
           />
         ) : (

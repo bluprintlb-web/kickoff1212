@@ -184,13 +184,14 @@ export const productRouter = router({
         basePrice: z.number().positive(),
         salePrice: z.number().positive().optional(),
         images: z.array(z.string()).default([]),
+        hasBarcode: z.boolean().default(true),
         variants: z.array(variantUpdateInput).default([]),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { id, variants, ...productData } = input;
+      const { id, variants, hasBarcode, ...productData } = input;
 
-      if (!requireBarcodeWhenStocked(variants)) {
+      if (hasBarcode && !requireBarcodeWhenStocked(variants)) {
         throw new TRPCError({ code: "BAD_REQUEST", message: BARCODE_REQUIRED_MESSAGE });
       }
 
@@ -275,13 +276,14 @@ export const productRouter = router({
         basePrice: z.number().positive(),
         salePrice: z.number().positive().optional(),
         images: z.array(z.string()).default([]),
+        hasBarcode: z.boolean().default(true),
         variants: z.array(variantInput).default([]),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { variants, ...productData } = input;
+      const { variants, hasBarcode, ...productData } = input;
 
-      if (!requireBarcodeWhenStocked(variants)) {
+      if (hasBarcode && !requireBarcodeWhenStocked(variants)) {
         throw new TRPCError({ code: "BAD_REQUEST", message: BARCODE_REQUIRED_MESSAGE });
       }
 

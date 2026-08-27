@@ -24,8 +24,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { AGE_GROUPS, PRODUCT_CATEGORIES } from "@/lib/product-category";
-import { GLOVE_SIZES, sizesForAgeGroup } from "@/lib/sizes";
+import { bootSizesForAgeGroup, GLOVE_SIZES, sizesForAgeGroup } from "@/lib/sizes";
 import { slugify } from "@/lib/slugify";
+import { cn } from "@/lib/utils";
 import { trpc } from "@/trpc/react";
 
 type VariantRow = {
@@ -47,15 +48,16 @@ function newVariantRow(): VariantRow {
   };
 }
 
-// Sizing only applies to Jerseys (Kids/Mens ladder, via ageGroup) and Gloves
-// (a fixed numeric ladder — gloves aren't split by kids/mens here). Every
-// other category keeps the flexible free-form variant list.
+// Sizing only applies to Jerseys and Boots (Kids/Mens ladder, via ageGroup)
+// and Gloves (a fixed numeric ladder — gloves aren't split by kids/mens
+// here). Every other category keeps the flexible free-form variant list.
 function fixedSizesFor(
   category: (typeof PRODUCT_CATEGORIES)[number],
   ageGroup: (typeof AGE_GROUPS)[number] | "NONE"
 ): readonly string[] {
   if (category === "GLOVES") return GLOVE_SIZES;
   if (category === "JERSEY") return sizesForAgeGroup(ageGroup === "NONE" ? undefined : ageGroup);
+  if (category === "BOOTS") return bootSizesForAgeGroup(ageGroup === "NONE" ? undefined : ageGroup);
   return [];
 }
 
@@ -182,6 +184,13 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
       : initialVariantRows
   );
   const [scanningRowId, setScanningRowId] = useState<string | null>(null);
+  // Defaults to required (matching the standing rule) for new products, and
+  // for edits of anything that already has at least one barcode on file.
+  // Only defaults off for an existing product that was saved with none at
+  // all — so opening it for edit doesn't immediately trip the requirement.
+  const [hasBarcode, setHasBarcode] = useState(
+    () => !initial || initial.variants.length === 0 || initial.variants.some((v) => v.barcode)
+  );
 
   // Cost price is never fetched until the PIN is verified — costUnlocked
   // just tracks whether that's happened this session; costPrice stays ""
@@ -220,7 +229,7 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
   function handleAgeGroupChange(value: (typeof AGE_GROUPS)[number] | "NONE") {
     setAgeGroup(value);
     if (value === "KIDS" || value === "ADULT") {
-      setVariants((rows) => sizeGridRows(sizesForAgeGroup(value), rows));
+      setVariants((rows) => sizeGridRows(fixedSizesFor(category, value), rows));
     } else {
       setVariants([newVariantRow()]);
     }
@@ -258,7 +267,7 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
         barcode: row.barcode || undefined,
       }));
 
-    if (variantInput.some((row) => row.stock > 0 && !row.barcode)) {
+    if (hasBarcode && variantInput.some((row) => row.stock > 0 && !row.barcode)) {
       toast.error("Every variant you're stocking needs a barcode — scan or enter one.");
       return;
     }
@@ -286,6 +295,7 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
       // edited) it this session — otherwise leave it untouched server-side.
       costPrice: costUnlocked && costPrice ? Number(costPrice) : undefined,
       images,
+      hasBarcode,
       variants: variantInput,
     };
 
@@ -401,7 +411,7 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
               </Select>
             </div>
 
-            {category === "JERSEY" && (
+            {(category === "JERSEY" || category === "BOOTS") && (
               <div className="flex flex-col gap-2">
                 <Label>Mens or kids?</Label>
                 <Select
@@ -416,8 +426,12 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="NONE">Choose one…</SelectItem>
-                    <SelectItem value="KIDS">Kids (20–30)</SelectItem>
-                    <SelectItem value="ADULT">Mens (S–2XL)</SelectItem>
+                    <SelectItem value="KIDS">
+                      {category === "BOOTS" ? "Kids (EU 28–35)" : "Kids (20–30)"}
+                    </SelectItem>
+                    <SelectItem value="ADULT">
+                      {category === "BOOTS" ? "Mens (EU 39–46)" : "Mens (S–2XL)"}
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -481,6 +495,38 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
               >
                 Enter PIN to view/edit
               </Button>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label>Barcode</Label>
+            <div className="flex gap-2">
+              {(
+                [
+                  { value: true, label: "Has barcode" },
+                  { value: false, label: "No barcode" },
+                ] as const
+              ).map((option) => (
+                <button
+                  key={String(option.value)}
+                  type="button"
+                  onClick={() => setHasBarcode(option.value)}
+                  className={cn(
+                    "rounded-full border px-4 py-1.5 text-sm font-medium transition-all duration-200",
+                    hasBarcode === option.value
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border text-muted-foreground hover:scale-105 hover:text-foreground"
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            {!hasBarcode && (
+              <p className="text-xs text-muted-foreground">
+                This product can still be sold in-store via the products
+                table&apos;s Sale button — just not by scanning.
+              </p>
             )}
           </div>
 
@@ -551,24 +597,35 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
                   />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <Label className="text-xs">Barcode</Label>
-                  <Input
-                    value={row.barcode}
-                    onChange={(e) =>
-                      updateVariant(row.clientId, { barcode: e.target.value })
-                    }
-                  />
-                </div>
+                {hasBarcode ? (
+                  <div className="flex flex-col gap-1">
+                    <Label className="text-xs">Barcode</Label>
+                    <Input
+                      value={row.barcode}
+                      onChange={(e) =>
+                        updateVariant(row.clientId, { barcode: e.target.value })
+                      }
+                    />
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-1">
+                    <Label className="text-xs text-muted-foreground">Barcode</Label>
+                    <p className="flex h-9 items-center text-xs text-muted-foreground">
+                      Not required
+                    </p>
+                  </div>
+                )}
 
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setScanningRowId(row.clientId)}
-                >
-                  Scan
-                </Button>
+                {hasBarcode && (
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setScanningRowId(row.clientId)}
+                  >
+                    Scan
+                  </Button>
+                )}
 
                 {!isSized && (
                   <Button

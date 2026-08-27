@@ -6,6 +6,7 @@ export const PRODUCT_CATEGORIES = [
   "BODYWEAR",
   "SHIN_PADS",
   "SOCKS",
+  "BOOTS",
 ] as const;
 
 export type ProductCategoryValue = (typeof PRODUCT_CATEGORIES)[number];
@@ -18,6 +19,7 @@ export const CATEGORY_LABELS: Record<ProductCategoryValue, string> = {
   BODYWEAR: "Bodywear",
   SHIN_PADS: "Shin pads",
   SOCKS: "Socks",
+  BOOTS: "Boots",
 };
 
 export const AGE_GROUPS = ["KIDS", "ADULT"] as const;

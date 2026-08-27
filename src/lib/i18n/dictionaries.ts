@@ -170,6 +170,7 @@ const en = {
     BODYWEAR: "Bodywear",
     SHIN_PADS: "Shin pads",
     SOCKS: "Socks",
+    BOOTS: "Boots",
   },
   jerseyMenu: {
     fan: "Fan version",
@@ -199,6 +200,10 @@ const en = {
     short: "Short socks",
     grip: "Grip socks",
     normal: "Normal socks",
+  },
+  bootsMenu: {
+    nike: "Nike",
+    adidas: "Adidas",
   },
   orderConfirmation: {
     title: "Order confirmed",
@@ -420,6 +425,7 @@ const ar: typeof en = {
     BODYWEAR: "ملابس أساسية",
     SHIN_PADS: "واقيات الساق",
     SOCKS: "جوارب",
+    BOOTS: "أحذية",
   },
   jerseyMenu: {
     fan: "نسخة المشجعين",
@@ -449,6 +455,10 @@ const ar: typeof en = {
     short: "جوارب قصيرة",
     grip: "جوارب مانعة للانزلاق",
     normal: "جوارب عادية",
+  },
+  bootsMenu: {
+    nike: "نايك",
+    adidas: "أديداس",
   },
   orderConfirmation: {
     title: "تم تأكيد الطلب",

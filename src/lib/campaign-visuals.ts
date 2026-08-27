@@ -13,14 +13,31 @@ export const CAMPAIGN_ICON: Record<CampaignId, typeof Trophy> = {
 };
 
 // Real competition crest, used in place of CAMPAIGN_ICON wherever a
-// campaign has one (currently only La Liga — the file is public-domain per
-// Wikimedia Commons, but the crest itself is still a La Liga trademark; see
-// CampaignIcon's usage sites). Motif particles (CAMPAIGN_MOTIF_ICON below)
-// intentionally keep the plain lucide icon instead — a real crest repeated
-// as tiny bouncing decoration would look cheap and multiplies the
-// trademark-use surface for no real benefit.
-export const CAMPAIGN_LOGO: Partial<Record<CampaignId, { src: string; alt: string }>> = {
+// campaign has one — La Liga, UEFA Champions League, and the 2026 FIFA
+// World Cup emblem, all sourced from Wikimedia Commons the same way (listed
+// public-domain for copyright there, but each mark is still a real
+// trademark of its federation; see CampaignIcon's usage sites, and the
+// 2026-08-26 decision note in CONTEXT_HANDOFF.md). Christmas has no
+// corresponding entry — it's a holiday, not a brand with a mark to source.
+// Motif particles (CAMPAIGN_MOTIF_ICON below) intentionally keep the plain
+// lucide icon instead — a real crest repeated as tiny bouncing decoration
+// would look cheap and multiplies the trademark-use surface for no real
+// benefit.
+export const CAMPAIGN_LOGO: Partial<
+  Record<CampaignId, { src: string; alt: string; monochrome?: boolean }>
+> = {
   "la-liga": { src: "/brand/laliga-logo.svg", alt: "La Liga" },
+  "champions-league": {
+    src: "/brand/champions-league-logo.svg",
+    alt: "UEFA Champions League",
+    // The Commons-sourced starball mark is a single flat dark-navy fill —
+    // CampaignIcon/CampaignMotifs render it white via a CSS filter so it
+    // reads against the campaign's own navy gradient instead of blending
+    // into it. La Liga/World Cup are already multicolor, so they don't
+    // need this.
+    monochrome: true,
+  },
+  "world-cup": { src: "/brand/world-cup-logo.svg", alt: "FIFA World Cup 2026" },
 };
 
 export const CAMPAIGN_MOTIF_ICON: Record<CampaignId, typeof Trophy> = {
