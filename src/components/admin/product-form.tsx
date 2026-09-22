@@ -1,5 +1,6 @@
 "use client";
 
+import { upload } from "@vercel/blob/client";
 import { Lock, Unlock, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -133,32 +134,33 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
   const [images, setImages] = useState<string[]>(initial?.images ?? []);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const getUploadSignature = trpc.product.imageUploadSignature.useMutation();
 
   async function handleFilesSelected(files: FileList | null) {
     if (!files || files.length === 0) return;
     setUploading(true);
     try {
-      const signature = await getUploadSignature.mutateAsync();
       const uploaded: string[] = [];
       for (const file of Array.from(files)) {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("api_key", signature.apiKey);
-        formData.append("timestamp", String(signature.timestamp));
-        formData.append("signature", signature.signature);
-        formData.append("folder", signature.folder);
-        const res = await fetch(
-          `https://api.cloudinary.com/v1_1/${signature.cloudName}/image/upload`,
-          { method: "POST", body: formData }
+        const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+        const blob = await upload(
+          `product-images/${crypto.randomUUID()}.${extension}`,
+          file,
+          { access: "public", handleUploadUrl: "/api/upload" }
         );
-        if (!res.ok) throw new Error("Upload failed");
-        const data = (await res.json()) as { secure_url: string };
-        uploaded.push(data.secure_url);
+        uploaded.push(blob.url);
       }
       setImages((prev) => [...prev, ...uploaded]);
-    } catch {
-      toast.error("Photo upload failed — check your connection and try again.");
+    } catch (err) {
+      // A genuine network failure (offline, DNS, CORS) throws a bare
+      // TypeError with an unhelpful browser message ("Failed to fetch") —
+      // keep the friendly copy for that. Everything else here is an error
+      // we threw ourselves (signature/config/Cloudinary response) with a
+      // real, actionable message, so show it.
+      const message =
+        err instanceof Error && err.message && !(err instanceof TypeError)
+          ? err.message
+          : "Photo upload failed — check your connection and try again.";
+      toast.error(message);
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

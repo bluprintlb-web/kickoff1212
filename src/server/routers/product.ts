@@ -1,7 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { Prisma } from "@/generated/prisma/client";
-import { cloudinary, CLOUDINARY_PRODUCT_FOLDER, isCloudinaryConfigured } from "@/lib/cloudinary";
 import { SOLD_ORDER_STATUSES } from "@/lib/order-status";
 import { AGE_GROUPS, PRODUCT_CATEGORIES } from "@/lib/product-category";
 import { adminProcedure, publicProcedure, router } from "@/server/trpc";
@@ -317,31 +316,10 @@ export const productRouter = router({
       }
     }),
 
-  // Signs a direct-to-Cloudinary upload so the admin's browser can POST the
-  // image file straight to Cloudinary (no routing large image bytes through
-  // our own serverless function / its request-body limit). The API secret
-  // never leaves the server — only the resulting signature does.
-  imageUploadSignature: adminProcedure.mutation(() => {
-    if (!isCloudinaryConfigured()) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Cloudinary isn't configured — set CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET.",
-      });
-    }
-    const timestamp = Math.round(Date.now() / 1000);
-    const paramsToSign = { timestamp, folder: CLOUDINARY_PRODUCT_FOLDER };
-    const signature = cloudinary.utils.api_sign_request(
-      paramsToSign,
-      process.env.CLOUDINARY_API_SECRET!
-    );
-    return {
-      timestamp,
-      folder: CLOUDINARY_PRODUCT_FOLDER,
-      signature,
-      apiKey: process.env.CLOUDINARY_API_KEY!,
-      cloudName: process.env.CLOUDINARY_CLOUD_NAME!,
-    };
-  }),
+  // Product photo uploads go straight from the admin's browser to Vercel
+  // Blob storage instead — see src/app/api/upload/route.ts (a plain Route
+  // Handler, not a tRPC procedure, since @vercel/blob/client's upload()
+  // helper has its own fixed request/response contract for minting tokens).
 
   // PIN check happens here, not client-side — costPrice is never sent to
   // the browser until this returns successfully, so there's nothing to

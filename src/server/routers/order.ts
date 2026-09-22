@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { getPaymentProvider } from "@/lib/payments";
+import { notifyOwnerOfOrder } from "@/lib/notify-order";
 import { notifyAdminsOfOrder } from "@/lib/push-notify";
 import { effectiveUnitPrice } from "@/lib/pricing";
 import { SOLD_ORDER_STATUSES } from "@/lib/order-status";
@@ -163,6 +164,24 @@ export const orderRouter = router({
         customerName: input.shippingName,
         total: Number(order.total),
         itemCount: cart.items.reduce((sum, item) => sum + item.quantity, 0),
+      });
+
+      notifyOwnerOfOrder({
+        orderId: order.id,
+        customerName: input.shippingName,
+        items: cart.items.map((item) => ({
+          name: item.variant.product.name,
+          size: item.variant.size,
+          quantity: item.quantity,
+          unitPrice: effectiveUnitPrice(item.variant),
+        })),
+        total: Number(order.total),
+        address: {
+          line1: input.shippingAddress,
+          city: input.shippingCity,
+          postalCode: input.shippingPostalCode,
+          country: input.shippingCountry,
+        },
       });
 
       const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";

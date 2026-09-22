@@ -1,3 +1,7 @@
+// UNUSED — product.imageUploadSignature now signs Firebase Storage uploads
+// instead (src/lib/firebase/admin.ts). Cloudinary sign-up geo-blocked this
+// account's location (2026-09-22); left in place rather than deleted in
+// case that ever changes.
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({

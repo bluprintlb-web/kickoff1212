@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CampaignIcon } from "@/components/campaign-icon";
 import { CampaignMotifs } from "@/components/campaign-motifs";
-import { ProductCard } from "@/components/product-card";
+import { CategoryTileImage } from "@/components/category-tile-image";
 import { Button } from "@/components/ui/button";
 import { CAMPAIGN_COPY_KEY, HERO_MOTIF_SLOTS } from "@/lib/campaign-visuals";
 import { formatLBP } from "@/lib/currency";
@@ -28,12 +28,17 @@ import { trpcCaller } from "@/trpc/server";
 // Homepage marketing tiles (not the real 7-category catalog — see
 // CONTEXT_HANDOFF.md "Content scope" decision). "Boots" is now a real
 // category (added 2026-08-26), so it links to its own filter like the rest.
+// `category` drives which real product photos each tile rotates through
+// (see MAX_TILE_IMAGES below) — retroJerseys/trainingKits intentionally
+// share JERSEY's photo pool, same as they already share its href.
 const ARCHIVE_CATEGORIES = [
-  { key: "retroJerseys", icon: ShoppingBag, href: "/products?category=JERSEY" },
-  { key: "trainingKits", icon: Shirt, href: "/products?category=JERSEY" },
-  { key: "boots", icon: SportShoe, href: "/products?category=BOOTS" },
-  { key: "accessories", icon: Crown, href: "/products?category=BALL" },
+  { key: "retroJerseys", icon: ShoppingBag, category: "JERSEY", href: "/products?category=JERSEY" },
+  { key: "trainingKits", icon: Shirt, category: "JERSEY", href: "/products?category=JERSEY" },
+  { key: "boots", icon: SportShoe, category: "BOOTS", href: "/products?category=BOOTS" },
+  { key: "accessories", icon: Crown, category: "BALL", href: "/products?category=BALL" },
 ] as const;
+
+const MAX_TILE_IMAGES = 5;
 
 const AUTHENTICITY_ITEMS = [
   { key: "crests", icon: Crown },
@@ -90,6 +95,18 @@ export default async function HomePage() {
   // the one surface with enough room to actually feel themed, not just
   // trimmed, so it gets a gradient wash, motifs, and its own badge line.
   const campaign = getActiveCampaign();
+
+  // Real product photos per category, for the tile grid below to rotate
+  // through — a category with no photos uploaded yet just gets an empty
+  // array, which CategoryTileImage renders as its plain icon fallback.
+  const categoryImages = new Map<string, string[]>();
+  for (const product of products) {
+    if (!product.images || product.images.length === 0) continue;
+    categoryImages.set(product.category, [
+      ...(categoryImages.get(product.category) ?? []),
+      ...product.images,
+    ]);
+  }
 
   const favorites: {
     key: keyof typeof FAN_FAVORITE_IMAGES;
@@ -184,20 +201,37 @@ export default async function HomePage() {
           </p>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {ARCHIVE_CATEGORIES.map(({ key, icon: Icon, href }) => (
-            <Link
-              key={key}
-              href={href}
-              className="group hover-lift flex flex-col items-center gap-3 rounded-xl border bg-gradient-to-br from-accent/10 to-brand/5 px-4 py-7 text-center hover:-translate-y-1 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/25"
-            >
-              <div className="hover-lift flex size-12 items-center justify-center rounded-lg bg-accent/20 text-accent-foreground group-hover:scale-110 group-hover:rotate-6 group-hover:bg-accent group-hover:text-accent-foreground">
-                <Icon className="size-6" />
-              </div>
-              <span className="text-sm font-medium">
-                {dict.categoriesSection[key]}
-              </span>
-            </Link>
-          ))}
+          {ARCHIVE_CATEGORIES.map(({ key, icon: Icon, category, href }, tileIndex) => {
+            // Staggers which photo each tile starts on, so the two JERSEY
+            // tiles (retroJerseys/trainingKits, same photo pool) don't
+            // visibly cycle in lockstep.
+            const pool = categoryImages.get(category) ?? [];
+            const images = [...pool.slice(tileIndex), ...pool.slice(0, tileIndex)].slice(
+              0,
+              MAX_TILE_IMAGES
+            );
+            return (
+              <Link
+                key={key}
+                href={href}
+                className="group hover-lift flex flex-col overflow-hidden rounded-xl border bg-gradient-to-br from-accent/10 to-brand/5 text-center hover:-translate-y-1 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/25"
+              >
+                <CategoryTileImage
+                  images={images}
+                  className="aspect-square w-full"
+                  fallback={
+                    <Icon
+                      className="hover-lift size-10 text-muted-foreground group-hover:scale-110 group-hover:rotate-6"
+                      strokeWidth={1.25}
+                    />
+                  }
+                />
+                <span className="px-4 py-4 text-sm font-medium">
+                  {dict.categoriesSection[key]}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
@@ -279,32 +313,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="flex-1 bg-gradient-to-b from-brand/5 via-transparent to-transparent">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 py-16 sm:py-20">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">
-              {dict.latestProducts.heading}
-            </h2>
-            <p className="text-sm text-muted-foreground">
-              {dict.latestProducts.subheading}
-            </p>
-          </div>
-          {products.length === 0 ? (
-            <p className="text-muted-foreground">{dict.latestProducts.empty}</p>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-              {products.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  index={index}
-                  locale={locale}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
     </div>
   );
 }
