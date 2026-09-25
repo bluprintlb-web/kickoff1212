@@ -25,6 +25,7 @@ export default async function EditProductPage({
         description: product.description,
         category: product.category,
         ageGroup: product.ageGroup,
+        jerseyType: product.jerseyType,
         basePrice: product.basePrice.toString(),
         salePrice: product.salePrice?.toString() ?? null,
         images: product.images,

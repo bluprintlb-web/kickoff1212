@@ -178,6 +178,10 @@ export async function SiteHeader() {
                       href: `/products?category=${category}&type=player`,
                       label: dict.jerseyMenu.player,
                     },
+                    {
+                      href: `/products?category=${category}&type=retro`,
+                      label: dict.jerseyMenu.retro,
+                    },
                   ]}
                 />
               );

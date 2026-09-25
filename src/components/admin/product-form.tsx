@@ -24,7 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AGE_GROUPS, PRODUCT_CATEGORIES } from "@/lib/product-category";
+import {
+  AGE_GROUPS,
+  JERSEY_TYPE_LABELS,
+  JERSEY_TYPES,
+  PRODUCT_CATEGORIES,
+} from "@/lib/product-category";
 import { bootSizesForAgeGroup, GLOVE_SIZES, sizesForAgeGroup } from "@/lib/sizes";
 import { slugify } from "@/lib/slugify";
 import { cn } from "@/lib/utils";
@@ -88,6 +93,7 @@ export type ProductFormInitialData = {
   description: string | null;
   category: (typeof PRODUCT_CATEGORIES)[number];
   ageGroup: (typeof AGE_GROUPS)[number] | null;
+  jerseyType: (typeof JERSEY_TYPES)[number] | null;
   basePrice: string;
   salePrice: string | null;
   images: string[];
@@ -128,6 +134,9 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
   );
   const [ageGroup, setAgeGroup] = useState<(typeof AGE_GROUPS)[number] | "NONE">(
     initial?.ageGroup ?? "NONE"
+  );
+  const [jerseyType, setJerseyType] = useState<(typeof JERSEY_TYPES)[number] | "NONE">(
+    initial?.jerseyType ?? "NONE"
   );
   const [basePrice, setBasePrice] = useState(initial?.basePrice ?? "");
   const [salePrice, setSalePrice] = useState(initial?.salePrice ?? "");
@@ -225,6 +234,7 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
   function handleCategoryChange(value: (typeof PRODUCT_CATEGORIES)[number]) {
     setCategory(value);
     setAgeGroup("NONE");
+    setJerseyType("NONE");
     setVariants(value === "GLOVES" ? sizeGridRows(GLOVE_SIZES, []) : [newVariantRow()]);
   }
 
@@ -291,6 +301,7 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
       slug,
       category,
       ageGroup: ageGroup === "NONE" ? undefined : ageGroup,
+      jerseyType: jerseyType === "NONE" ? undefined : jerseyType,
       basePrice: price,
       salePrice: salePrice ? Number(salePrice) : undefined,
       // Only send costPrice if the admin actually unlocked (and possibly
@@ -434,6 +445,31 @@ export function ProductForm({ initial }: { initial?: ProductFormInitialData }) {
                     <SelectItem value="ADULT">
                       {category === "BOOTS" ? "Mens (EU 39–46)" : "Mens (S–2XL)"}
                     </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {category === "JERSEY" && (
+              <div className="flex flex-col gap-2">
+                <Label>Fan, player, or retro?</Label>
+                <Select
+                  value={jerseyType}
+                  onValueChange={(value) =>
+                    value &&
+                    setJerseyType(value as (typeof JERSEY_TYPES)[number] | "NONE")
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NONE">Choose one…</SelectItem>
+                    {JERSEY_TYPES.map((value) => (
+                      <SelectItem key={value} value={value}>
+                        {JERSEY_TYPE_LABELS[value]}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

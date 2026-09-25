@@ -8,7 +8,7 @@ export const KIDS_SIZES = ["20", "22", "24", "26", "28", "30"] as const;
 
 export const MENS_SIZES = ["S", "M", "L", "XL", "XXL"] as const; // XXL = 2XL
 
-export const GLOVE_SIZES = ["4", "5", "6", "7", "8", "9", "10", "11"] as const;
+export const GLOVE_SIZES = ["6", "7", "8", "9", "10"] as const;
 
 // Football boot sizing uses EU numbering, the standard for this market.
 export const BOOTS_KIDS_SIZES = ["28", "29", "30", "31", "32", "33", "34", "35"] as const;

@@ -2,7 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { Prisma } from "@/generated/prisma/client";
 import { SOLD_ORDER_STATUSES } from "@/lib/order-status";
-import { AGE_GROUPS, PRODUCT_CATEGORIES } from "@/lib/product-category";
+import { AGE_GROUPS, JERSEY_TYPES, PRODUCT_CATEGORIES } from "@/lib/product-category";
 import { adminProcedure, publicProcedure, router } from "@/server/trpc";
 
 const variantInput = z.object({
@@ -179,6 +179,7 @@ export const productRouter = router({
         description: z.string().optional(),
         category: z.enum(PRODUCT_CATEGORIES),
         ageGroup: z.enum(AGE_GROUPS).optional(),
+        jerseyType: z.enum(JERSEY_TYPES).optional(),
         costPrice: z.number().nonnegative().optional(),
         basePrice: z.number().positive(),
         salePrice: z.number().positive().optional(),
@@ -271,6 +272,7 @@ export const productRouter = router({
         description: z.string().optional(),
         category: z.enum(PRODUCT_CATEGORIES),
         ageGroup: z.enum(AGE_GROUPS).optional(),
+        jerseyType: z.enum(JERSEY_TYPES).optional(),
         costPrice: z.number().nonnegative().optional(),
         basePrice: z.number().positive(),
         salePrice: z.number().positive().optional(),

@@ -6,6 +6,7 @@ import { dictionaries, t } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/get-locale";
 import {
   PRODUCT_CATEGORIES,
+  type JerseyTypeValue,
   type ProductCategoryValue,
 } from "@/lib/product-category";
 import { trpcCaller } from "@/trpc/server";
@@ -14,20 +15,33 @@ function isProductCategory(value: string): value is ProductCategoryValue {
   return (PRODUCT_CATEGORIES as readonly string[]).includes(value);
 }
 
+// The header's jersey dropdown links with ?type=fan/player/retro (lowercase,
+// matches the other category dropdowns' query style) — map that back to the
+// Product.jerseyType enum.
+const JERSEY_TYPE_PARAMS: Record<string, JerseyTypeValue> = {
+  fan: "FAN",
+  player: "PLAYER",
+  retro: "RETRO",
+};
+
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; type?: string }>;
 }) {
-  const { category } = await searchParams;
+  const { category, type } = await searchParams;
   const activeCategory = category && isProductCategory(category) ? category : undefined;
+  const activeJerseyType =
+    activeCategory === "JERSEY" && type ? JERSEY_TYPE_PARAMS[type] : undefined;
 
   const [trpc, locale] = await Promise.all([trpcCaller(), getLocale()]);
   const products = await trpc.product.list();
   const dict = dictionaries[locale];
-  const filtered = activeCategory
-    ? products.filter((product) => product.category === activeCategory)
-    : products;
+  const filtered = products.filter((product) => {
+    if (activeCategory && product.category !== activeCategory) return false;
+    if (activeJerseyType && product.jerseyType !== activeJerseyType) return false;
+    return true;
+  });
   // Same active campaign as the header/hero — browsing should feel themed
   // too, not just the homepage.
   const campaign = getActiveCampaign();

@@ -123,6 +123,15 @@ enum AgeGroup {
   ADULT
 }
 
+// Which kit version a jersey is. Only meaningful when Product.category =
+// JERSEY — see src/lib/product-category.ts JERSEY_TYPES/JERSEY_TYPE_LABELS.
+// Leave unset for every other category.
+enum JerseyType {
+  FAN
+  PLAYER
+  RETRO
+}
+
 model Product {
   id          String          @id @default(cuid())
   name        String
@@ -133,6 +142,8 @@ model Product {
   description String?         @db.Text
   category    ProductCategory
   ageGroup    AgeGroup?
+  // Fan / Player / Retro version — only set when category = JERSEY.
+  jerseyType  JerseyType?
   // What the store paid to acquire the item. Never sent to the storefront,
   // and only exposed in the admin UI after a PIN check — see
   // productRouter.revealCostPrice/revealAllCostPrices in

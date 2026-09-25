@@ -175,6 +175,7 @@ const en = {
   jerseyMenu: {
     fan: "Fan version",
     player: "Player version",
+    retro: "Retro",
   },
   trophyMenu: {
     worldCup: "World Cup",
@@ -430,6 +431,7 @@ const ar: typeof en = {
   jerseyMenu: {
     fan: "نسخة المشجعين",
     player: "نسخة اللاعبين",
+    retro: "كلاسيكية",
   },
   trophyMenu: {
     worldCup: "كأس العالم",
