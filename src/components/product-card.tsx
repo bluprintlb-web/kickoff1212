@@ -42,7 +42,7 @@ export function ProductCard({
       className="animate-in fade-in slide-in-from-bottom-2 duration-500"
       style={{ animationDelay: `${index * 60}ms`, animationFillMode: "both" }}
     >
-      <Card className="hover-lift h-full gap-0 py-0 hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/20 hover:ring-1 hover:ring-accent/40">
+      <Card className="hover-lift group h-full gap-0 overflow-hidden rounded-none border border-border py-0 ring-0 hover:-translate-y-1 hover:border-accent hover:shadow-xl hover:shadow-accent/20">
         <ProductImage
           src={product.images?.[0]}
           alt={productName(product, locale)}

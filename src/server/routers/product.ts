@@ -51,12 +51,28 @@ function friendlyUniqueConstraintMessage(err: Prisma.PrismaClientKnownRequestErr
 // sent to the client (storefront or admin) until the PIN is verified.
 
 export const productRouter = router({
+  // Same category order everywhere a catalog grid groups by category/type
+  // (e.g. the /products page) — Postgres sorts these native enums by their
+  // schema.prisma declaration order, which matches PRODUCT_CATEGORIES /
+  // JERSEY_TYPES in src/lib/product-category.ts, so this groups "for free".
   list: publicProcedure.query(({ ctx }) =>
     ctx.prisma.product.findMany({
       where: { isActive: true },
       include: { variants: true },
       omit: { costPrice: true },
-      orderBy: { createdAt: "desc" },
+      orderBy: [{ category: "asc" }, { jerseyType: "asc" }, { createdAt: "desc" }],
+    })
+  ),
+
+  // Admin POS's "Add manually" search: needs every product that can still be
+  // sold — including archived (isActive: false) ones with leftover stock,
+  // which byBarcode/variantById already reach by variant id/barcode — without
+  // adminList's per-product sold/revenue aggregation, which this doesn't use.
+  sellable: adminProcedure.query(({ ctx }) =>
+    ctx.prisma.product.findMany({
+      omit: { costPrice: true },
+      include: { variants: true },
+      orderBy: [{ category: "asc" }, { jerseyType: "asc" }, { createdAt: "desc" }],
     })
   ),
 

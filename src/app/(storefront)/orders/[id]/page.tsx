@@ -1,11 +1,14 @@
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Package } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { ProductImage } from "@/components/product-image";
+import { CATEGORY_ICONS } from "@/lib/category-icons";
 import { formatLBP } from "@/lib/currency";
 import { verifySession } from "@/lib/dal";
 import { dictionaries } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/get-locale";
 import { productName } from "@/lib/i18n/product-name";
+import type { ProductCategoryValue } from "@/lib/product-category";
 import { trpcCaller } from "@/trpc/server";
 
 const STATUS_TONE: Record<string, string> = {
@@ -35,12 +38,12 @@ export default async function OrderPage({
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-16">
+    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-4 py-16 sm:px-6 lg:px-8">
       <div className="flex flex-col items-center gap-2 text-center">
         <div className="flex size-12 items-center justify-center rounded-full bg-brand/10 text-brand">
           <CheckCircle2 className="size-6" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">{dict.title}</h1>
+        <h1 className="font-display text-3xl tracking-wide">{dict.title}</h1>
         <p className="text-sm text-muted-foreground">
           {dict.order} #{order.id}
         </p>
@@ -64,19 +67,33 @@ export default async function OrderPage({
 
         <div className="flex flex-col divide-y">
           {order.items.map((item) => (
-            <div key={item.id} className="flex items-center justify-between px-6 py-3">
-              <span className="text-sm">
-                {item.variant ? (
-                  <>
-                    {productName(item.variant.product, locale)}
-                    {item.variant.size ? ` (${item.variant.size})` : ""}
-                  </>
-                ) : (
-                  dict.itemUnavailable
-                )}{" "}
-                × {item.quantity}
-              </span>
-              <span className="text-sm font-medium">
+            <div key={item.id} className="flex items-center justify-between gap-4 px-6 py-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <ProductImage
+                  src={item.variant?.product.images[0]}
+                  alt=""
+                  icon={
+                    item.variant
+                      ? CATEGORY_ICONS[item.variant.product.category as ProductCategoryValue]
+                      : Package
+                  }
+                  className="size-12 shrink-0 border"
+                  iconClassName="size-5"
+                  sizes="48px"
+                />
+                <span className="truncate text-sm">
+                  {item.variant ? (
+                    <>
+                      {productName(item.variant.product, locale)}
+                      {item.variant.size ? ` (${item.variant.size})` : ""}
+                    </>
+                  ) : (
+                    dict.itemUnavailable
+                  )}{" "}
+                  × {item.quantity}
+                </span>
+              </div>
+              <span className="shrink-0 text-sm font-medium">
                 ${(Number(item.unitPrice) * item.quantity).toFixed(2)}
               </span>
             </div>

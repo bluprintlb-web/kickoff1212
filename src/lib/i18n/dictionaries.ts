@@ -33,6 +33,7 @@ const en = {
   },
   fanFavorites: {
     heading: "Fan Favorites",
+    viewItem: "View Jersey",
     viewArchive: "View Full Archive",
     items: {
       milanoRossoneri: { name: "Milano Rossoneri '94", badge: "1994 Home" },
@@ -289,6 +290,7 @@ const ar: typeof en = {
   },
   fanFavorites: {
     heading: "مفضلات الجماهير",
+    viewItem: "عرض القميص",
     viewArchive: "عرض الأرشيف الكامل",
     items: {
       milanoRossoneri: { name: "ميلانو روسونيري ’94", badge: "1994 – الديار" },

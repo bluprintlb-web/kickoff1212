@@ -73,13 +73,13 @@ export function CheckoutForm({ locale }: { locale: Locale }) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-16">
-      <h1 className="text-3xl font-bold tracking-tight">{dict.title}</h1>
+    <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-6 px-4 py-16 sm:px-6 lg:px-8">
+      <h1 className="font-display text-4xl tracking-wide">{dict.title}</h1>
 
       <Card className="px-6">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <div className="flex flex-col gap-4">
-            <p className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+            <p className="text-sm font-semibold tracking-wide text-accent uppercase">
               {dict.shippingDetails}
             </p>
             <div className="flex flex-col gap-2">
@@ -132,7 +132,7 @@ export function CheckoutForm({ locale }: { locale: Locale }) {
           </div>
 
           <div className="flex flex-col gap-3 border-t pt-6">
-            <p className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+            <p className="text-sm font-semibold tracking-wide text-accent uppercase">
               {dict.paymentMethod}
             </p>
             <div className="flex gap-2">

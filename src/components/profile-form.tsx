@@ -87,7 +87,7 @@ export function ProfileForm({
   return (
     <div className="flex w-full flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold tracking-tight">{dict.title}</h1>
+        <h1 className="font-display text-3xl tracking-wide">{dict.title}</h1>
         <p className="text-sm text-muted-foreground">{dict.subtitle}</p>
       </div>
 

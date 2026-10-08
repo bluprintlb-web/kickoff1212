@@ -16,7 +16,7 @@ export function RegisterForm({ locale }: { locale: Locale }) {
   return (
     <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center gap-6 px-4 py-24">
       <div className="flex flex-col gap-1 text-center">
-        <h1 className="text-2xl font-bold tracking-tight">{dict.createAccount}</h1>
+        <h1 className="font-display text-3xl tracking-wide">{dict.createAccount}</h1>
         <p className="text-sm text-muted-foreground">{dict.registerSubtitle}</p>
       </div>
 

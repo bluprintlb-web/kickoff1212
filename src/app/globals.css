@@ -263,6 +263,62 @@ html[data-hide-splash="1"] #app-splash {
       cubic-bezier(0.4, 0, 0.2, 1),
       cubic-bezier(0.4, 0, 0.2, 1);
   }
+
+  /* Editorial-pass additions (2026-10-08) — small, reusable primitives for
+     the bolder/higher-contrast homepage pass, layered on top of the
+     existing black/green/Jersey-15 identity rather than replacing it. */
+
+  /* Section kicker: a numbered, tracked, uppercase label (e.g. "01 — The
+     Archive") that ties sections together like a matchday programme
+     running order. font-display at small size reads as a scoreboard
+     numeral, not a heading, so it doesn't compete with the real h2s. */
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    font-family: var(--font-display);
+    font-size: 0.8125rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted-foreground);
+  }
+  .kicker::before {
+    content: "";
+    display: inline-block;
+    width: 1.5rem;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  /* Duotone-pitch: grayscales a photo and tints it black→green via a
+     color-blended overlay, so the brand's own accent lives inside the
+     photography instead of only in UI chrome — a classic bold-sports-
+     editorial move. Apply to a `relative overflow-hidden` wrapper around
+     an `object-cover` image; the image itself still needs `grayscale`. */
+  .duotone-pitch::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      160deg,
+      color-mix(in oklch, var(--accent), transparent 15%),
+      transparent 45%,
+      color-mix(in oklch, black, transparent 10%) 100%
+    );
+    mix-blend-mode: color;
+    pointer-events: none;
+  }
+
+  /* Hover-zoom: a slow, deliberate photo zoom on card hover — paired with
+     .hover-lift on the same element for the shadow/translate half, kept as
+     its own class since a plain `scale-105` would move everything in the
+     card (including badges positioned via inset), not just the photo. */
+  .hover-zoom {
+    transition: scale 600ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .group:hover .hover-zoom {
+    scale: 1.06;
+  }
 }
 
 @keyframes kickoff-icon-bounce {

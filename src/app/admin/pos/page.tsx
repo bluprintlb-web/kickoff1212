@@ -1,9 +1,13 @@
 "use client";
 
-import { ScanLine } from "lucide-react";
+import { ScanLine, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import {
+  PosManualAddDialog,
+  type PickableVariant,
+} from "@/components/admin/pos-manual-add-dialog";
 import { BarcodeScanner } from "@/components/barcode-scanner";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,7 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { effectiveUnitPrice, type Money } from "@/lib/pricing";
+import { effectiveUnitPrice } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/trpc/react";
 
@@ -40,6 +44,7 @@ export default function PosPage() {
   const utils = trpc.useUtils();
   const searchParams = useSearchParams();
   const [scannerOpen, setScannerOpen] = useState(false);
+  const [manualAddOpen, setManualAddOpen] = useState(false);
   const [lines, setLines] = useState<SaleLine[]>([]);
   const [paymentMethod, setPaymentMethod] =
     useState<(typeof PAYMENT_METHODS)[number]>("CASH");
@@ -52,14 +57,7 @@ export default function PosPage() {
     onError: (error) => toast.error(error.message),
   });
 
-  function addVariantToSale(variant: {
-    id: string;
-    stock: number;
-    size: string | null;
-    color: string | null;
-    priceOverride: Money;
-    product: { name: string; basePrice: Money; salePrice: Money };
-  }) {
+  function addVariantToSale(variant: PickableVariant) {
     if (variant.stock <= 0) {
       toast.error(`${variant.product.name} is out of stock`);
       return;
@@ -133,10 +131,16 @@ export default function PosPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-3xl tracking-wide">Sell (POS)</h1>
-        <Button variant="default" size="lg" onClick={() => setScannerOpen(true)}>
-          <ScanLine className="size-4" />
-          Scan item
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="lg" onClick={() => setManualAddOpen(true)}>
+            <Search className="size-4" />
+            Add manually
+          </Button>
+          <Button variant="default" size="lg" onClick={() => setScannerOpen(true)}>
+            <ScanLine className="size-4" />
+            Scan item
+          </Button>
+        </div>
       </div>
 
       <Card className="py-0">
@@ -251,6 +255,12 @@ export default function PosPage() {
           </Button>
         </div>
       </Card>
+
+      <PosManualAddDialog
+        open={manualAddOpen}
+        onOpenChange={setManualAddOpen}
+        onAdd={addVariantToSale}
+      />
 
       <Dialog open={scannerOpen} onOpenChange={setScannerOpen}>
         <DialogContent>

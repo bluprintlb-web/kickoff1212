@@ -30,7 +30,7 @@ export function ProductImage({
       )}
     >
       {src ? (
-        <Image src={src} alt={alt} fill sizes={sizes} className="object-cover" />
+        <Image src={src} alt={alt} fill sizes={sizes} className="hover-zoom object-cover" />
       ) : (
         <Icon className={cn("text-muted-foreground", iconClassName)} strokeWidth={1.25} />
       )}

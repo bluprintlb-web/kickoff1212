@@ -1,4 +1,5 @@
 import {
+  ArrowUpRight,
   Crown,
   Flag,
   Leaf,
@@ -11,6 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CampaignIcon } from "@/components/campaign-icon";
 import { CampaignMotifs } from "@/components/campaign-motifs";
+import { OffsetAccentFrame } from "@/components/offset-accent-frame";
 import { CategoryTileImage } from "@/components/category-tile-image";
 import { Button } from "@/components/ui/button";
 import { CAMPAIGN_COPY_KEY, HERO_MOTIF_SLOTS } from "@/lib/campaign-visuals";
@@ -52,36 +54,47 @@ function FanFavoriteCard({
   badge,
   price,
   image,
+  viewLabel,
 }: {
   name: string;
   badge: string;
   price: number;
   image: string;
+  viewLabel: string;
 }) {
   return (
     <Link
       href="/products?category=JERSEY"
-      className="hover-lift group block overflow-hidden rounded-xl border bg-card hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/20"
+      className="hover-lift group block min-w-0 overflow-hidden border border-border bg-card hover:-translate-y-1 hover:border-accent hover:shadow-xl hover:shadow-accent/20"
     >
-      <div className="relative aspect-square w-full overflow-hidden">
+      <div className="relative aspect-square w-full overflow-hidden bg-muted">
         <Image
           src={image}
           alt=""
           fill
           sizes="(min-width: 768px) 33vw, 100vw"
-          className="hover-lift object-cover group-hover:scale-105"
+          className="hover-zoom object-cover"
         />
-        <span className="font-display absolute start-3 top-3 rounded-md bg-accent px-2.5 py-1 text-sm text-accent-foreground uppercase shadow">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent opacity-60 transition-opacity duration-300 group-hover:opacity-100"
+        />
+        <span className="font-display absolute start-0 top-0 bg-accent px-3 py-1.5 text-sm text-accent-foreground uppercase shadow">
           {badge}
         </span>
-        <span className="absolute end-3 bottom-3 flex size-9 items-center justify-center rounded-full bg-background/90 text-foreground shadow">
-          <ShoppingBag className="size-4" aria-hidden />
+        {/* Visible at baseline (not just on :hover) so touch devices, which never
+            get a persistent hover state, still see this tile is actionable. */}
+        <span className="absolute inset-x-4 bottom-4 flex translate-y-1 items-center gap-1.5 text-sm font-semibold tracking-wide text-white uppercase transition-transform duration-300 group-hover:translate-y-0">
+          {viewLabel}
+          <ArrowUpRight className="size-4" aria-hidden />
         </span>
       </div>
-      <div className="flex flex-col gap-1 p-4">
+      <div className="flex flex-col gap-1 border-t p-4">
         <p className="leading-snug font-medium">{name}</p>
-        <p className="text-lg font-semibold text-brand">${price}</p>
-        <p className="text-xs text-muted-foreground">{formatLBP(price)}</p>
+        <div className="flex items-baseline gap-2">
+          <p className="text-lg font-semibold text-brand">${price}</p>
+          <p className="text-xs text-muted-foreground">{formatLBP(price)}</p>
+        </div>
       </div>
     </Link>
   );
@@ -135,8 +148,8 @@ export default async function HomePage() {
           />
         )}
         {campaign && <CampaignMotifs campaign={campaign} slots={HERO_MOTIF_SLOTS} iconClassName="size-10 text-white/50" />}
-        <div className="animate-in fade-in slide-in-from-bottom-4 relative mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-10 px-4 py-16 duration-700 sm:py-20 lg:grid-cols-2 lg:gap-12">
-          <div className="flex flex-col gap-5">
+        <div className="animate-in fade-in slide-in-from-bottom-4 relative mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 px-4 py-20 duration-700 sm:px-6 sm:py-28 lg:grid-cols-2 lg:gap-16 lg:px-8">
+          <div className="flex min-w-0 flex-col gap-6 lg:border-e lg:border-white/10 lg:pe-14">
             {campaign && (
               <span
                 className="inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold tracking-wide text-white uppercase"
@@ -146,11 +159,11 @@ export default async function HomePage() {
                 {dict.campaigns[CAMPAIGN_COPY_KEY[campaign.id]]}
               </span>
             )}
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium tracking-wide text-accent uppercase">
-              <Flag className="size-3.5 shrink-0" aria-hidden />
+            <span className="kicker text-surface-brand-foreground/50">
+              <Flag className="size-3.5 shrink-0 text-accent" aria-hidden />
               {dict.hero.archiveBadge}
             </span>
-            <h1 className="font-display text-7xl leading-[0.95] tracking-wide sm:text-8xl">
+            <h1 className="min-w-0 font-display text-5xl leading-[0.95] tracking-wide sm:text-8xl sm:leading-[0.92] lg:text-9xl">
               {dict.hero.titleLine1}
               <br />
               <span className="text-accent">{dict.hero.titleHighlight}</span>
@@ -158,9 +171,13 @@ export default async function HomePage() {
             <p className="max-w-xl text-lg text-surface-brand-foreground/70">
               {dict.hero.tagline}
             </p>
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link href="/products">
-                <Button variant="accent" size="lg" className="hover:scale-105">
+                <Button
+                  variant="accent"
+                  size="lg"
+                  className="h-12 px-6 text-base tracking-wide uppercase hover:scale-105"
+                >
                   {dict.hero.shopAll}
                 </Button>
               </Link>
@@ -168,39 +185,43 @@ export default async function HomePage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="border-surface-brand-foreground/25 bg-transparent text-surface-brand-foreground hover:scale-105 hover:bg-white/10 hover:text-surface-brand-foreground"
+                  className="h-12 border-surface-brand-foreground/25 bg-transparent px-6 text-base tracking-wide uppercase text-surface-brand-foreground hover:scale-105 hover:bg-white/10 hover:text-surface-brand-foreground"
                 >
                   {dict.hero.browseCategories}
                 </Button>
               </Link>
             </div>
           </div>
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-white/10 shadow-2xl">
-            <Image
-              src={HERO_IMAGE}
-              alt=""
-              fill
-              priority
-              sizes="(min-width: 1024px) 40vw, 90vw"
-              className="object-cover"
-            />
-            <span className="font-display absolute start-4 top-4 rounded-md bg-accent px-3 py-1 text-lg text-accent-foreground shadow">
-              No. 10
-            </span>
+          <div className="relative">
+            <OffsetAccentFrame gap="5" />
+            <div className="relative aspect-[4/5] w-full overflow-hidden border border-white/10 shadow-2xl">
+              <Image
+                src={HERO_IMAGE}
+                alt=""
+                fill
+                priority
+                sizes="(min-width: 1024px) 40vw, 90vw"
+                className="object-cover"
+              />
+              <span className="font-display absolute start-0 top-0 bg-accent px-4 py-2 text-xl text-accent-foreground shadow-lg">
+                No. 10
+              </span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section id="categories" className="mx-auto flex w-full max-w-6xl scroll-mt-16 flex-col gap-5 px-4 py-16 sm:py-20">
-        <div>
-          <h2 className="font-display text-3xl tracking-wide">
+      <section id="categories" className="mx-auto flex w-full max-w-6xl scroll-mt-16 flex-col gap-6 px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+        <div className="flex flex-col gap-3">
+          <span className="kicker">01</span>
+          <h2 className="font-display text-4xl tracking-wide sm:text-5xl">
             {dict.categoriesSection.heading}
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="max-w-md text-sm text-muted-foreground">
             {dict.categoriesSection.subheading}
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-5">
           {ARCHIVE_CATEGORIES.map(({ key, icon: Icon, category, href }, tileIndex) => {
             // Staggers which photo each tile starts on, so the two JERSEY
             // tiles (retroJerseys/trainingKits, same photo pool) don't
@@ -214,7 +235,7 @@ export default async function HomePage() {
               <Link
                 key={key}
                 href={href}
-                className="group hover-lift flex flex-col overflow-hidden rounded-xl border bg-gradient-to-br from-accent/10 to-brand/5 text-center hover:-translate-y-1 hover:border-accent/50 hover:shadow-lg hover:shadow-accent/25"
+                className="group hover-lift flex min-w-0 flex-col overflow-hidden border border-border bg-gradient-to-br from-accent/10 to-brand/5 text-center hover:-translate-y-1 hover:border-accent hover:shadow-xl hover:shadow-accent/20"
               >
                 <CategoryTileImage
                   images={images}
@@ -226,7 +247,7 @@ export default async function HomePage() {
                     />
                   }
                 />
-                <span className="px-4 py-4 text-sm font-medium">
+                <span className="min-w-0 border-t px-4 py-4 text-sm font-semibold tracking-wide break-words uppercase group-hover:text-accent">
                   {dict.categoriesSection[key]}
                 </span>
               </Link>
@@ -235,14 +256,15 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="border-y bg-gradient-to-r from-accent/10 via-brand/5 to-accent/10">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-16 sm:py-20">
-          <div>
-            <h2 className="font-display text-3xl tracking-wide">
+      <section className="border-t-2 border-accent border-b">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+          <div className="flex flex-col gap-3">
+            <span className="kicker">02</span>
+            <h2 className="font-display text-4xl tracking-wide sm:text-5xl">
               {dict.fanFavorites.heading}
             </h2>
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
             {favorites.map(({ key, price }) => (
               <FanFavoriteCard
                 key={key}
@@ -250,58 +272,73 @@ export default async function HomePage() {
                 badge={dict.fanFavorites.items[key].badge}
                 price={price}
                 image={FAN_FAVORITE_IMAGES[key]}
+                viewLabel={dict.fanFavorites.viewItem}
               />
             ))}
           </div>
           <Link href="/products?category=JERSEY" className="mx-auto">
-            <Button variant="outline" size="lg" className="hover:scale-105">
+            <Button
+              variant="outline"
+              size="lg"
+              className="h-12 px-6 text-base tracking-wide uppercase hover:scale-105"
+            >
               {dict.fanFavorites.viewArchive}
             </Button>
           </Link>
         </div>
       </section>
 
-      <section id="story" className="mx-auto flex w-full max-w-6xl scroll-mt-16 flex-col items-center gap-10 px-4 py-16 sm:py-20 lg:flex-row">
-        <div className="relative aspect-[3/4] w-full max-w-sm shrink-0 overflow-hidden rounded-2xl border">
+      <section id="story" className="mx-auto flex w-full max-w-6xl scroll-mt-16 flex-col items-center gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:flex-row lg:px-8">
+        <div className="duotone-pitch relative aspect-[3/4] w-full max-w-sm shrink-0 overflow-hidden border">
           <Image
             src={STORY_IMAGE}
             alt=""
             fill
             sizes="(min-width: 1024px) 30vw, 90vw"
-            className="object-cover grayscale"
+            className="object-cover grayscale contrast-110"
           />
         </div>
         <div className="flex flex-col gap-4">
-          <h2 className="font-display text-3xl tracking-wide sm:text-4xl">
+          <span className="kicker">03</span>
+          <h2 className="font-display text-4xl tracking-wide sm:text-5xl">
             {dict.story.heading}
           </h2>
           <p className="max-w-xl text-muted-foreground">{dict.story.body}</p>
-          <div className="flex flex-wrap gap-8 pt-2">
+          <div className="flex flex-wrap gap-10 pt-2">
             <div>
-              <p className="text-3xl font-bold text-brand">1,200+</p>
-              <p className="text-sm text-muted-foreground">{dict.story.statsArchived}</p>
+              <p className="font-display text-4xl text-accent">1,200+</p>
+              <p className="text-sm tracking-wide text-muted-foreground uppercase">
+                {dict.story.statsArchived}
+              </p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-brand">80+</p>
-              <p className="text-sm text-muted-foreground">{dict.story.statsClubs}</p>
+              <p className="font-display text-4xl text-accent">80+</p>
+              <p className="text-sm tracking-wide text-muted-foreground uppercase">
+                {dict.story.statsClubs}
+              </p>
             </div>
             <div>
-              <p className="text-3xl font-bold text-brand">12</p>
-              <p className="text-sm text-muted-foreground">{dict.story.statsYears}</p>
+              <p className="font-display text-4xl text-accent">12</p>
+              <p className="text-sm tracking-wide text-muted-foreground uppercase">
+                {dict.story.statsYears}
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       <section className="border-y bg-muted/30">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-14">
-          <h2 className="font-display text-center text-2xl tracking-wide">
-            {dict.authenticity.heading}
-          </h2>
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+          <div className="flex flex-col items-center gap-3">
+            <span className="kicker">04</span>
+            <h2 className="font-display text-center text-3xl tracking-wide">
+              {dict.authenticity.heading}
+            </h2>
+          </div>
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {AUTHENTICITY_ITEMS.map(({ key, icon: Icon }) => (
               <div key={key} className="flex flex-col items-center gap-2 text-center">
-                <div className="hover-lift flex size-12 items-center justify-center rounded-full bg-accent/15 text-accent-foreground">
+                <div className="hover-lift flex size-14 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent-foreground hover:scale-110 hover:bg-accent/20">
                   <Icon className="size-6" />
                 </div>
                 <span className="text-sm font-medium">

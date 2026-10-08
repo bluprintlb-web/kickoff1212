@@ -37,6 +37,9 @@ export default async function ProductsPage({
   const [trpc, locale] = await Promise.all([trpcCaller(), getLocale()]);
   const products = await trpc.product.list();
   const dict = dictionaries[locale];
+  // product.list already orders by category then jerseyType (matching
+  // PRODUCT_CATEGORIES/JERSEY_TYPES), so same-category/type items are
+  // already grouped together — just filter, no re-sort needed here.
   const filtered = products.filter((product) => {
     if (activeCategory && product.category !== activeCategory) return false;
     if (activeJerseyType && product.jerseyType !== activeJerseyType) return false;
@@ -57,13 +60,13 @@ export default async function ProductsPage({
             <CampaignMotifs campaign={campaign} slots={BANNER_MOTIF_SLOTS} iconClassName="size-4 text-white/40" />
           </div>
         )}
-        <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-12">
+        <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-14 sm:px-6 lg:px-8">
           <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
             <h1
               className={
                 campaign
-                  ? "text-3xl font-bold tracking-tight text-white"
-                  : "text-3xl font-bold tracking-tight"
+                  ? "font-display text-4xl tracking-wide text-white"
+                  : "font-display text-4xl tracking-wide"
               }
             >
               {activeCategory
@@ -82,7 +85,7 @@ export default async function ProductsPage({
         </div>
       </div>
 
-      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-10">
+      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-6 px-4 py-12 sm:px-6 lg:px-8">
         {filtered.length === 0 ? (
           <p className="text-muted-foreground">
             {products.length === 0
@@ -90,7 +93,7 @@ export default async function ProductsPage({
               : dict.productsPage.emptyCategory}
           </p>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-3">
             {filtered.map((product, index) => (
               <ProductCard
                 key={product.id}

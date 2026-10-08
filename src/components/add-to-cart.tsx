@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { variantLabel, VariantPill } from "@/components/variant-pill";
 import { dispatchCartItemAdded } from "@/lib/cart-events";
 import { dictionaries, type Locale } from "@/lib/i18n/dictionaries";
-import { cn } from "@/lib/utils";
 import { trpc } from "@/trpc/react";
 
 type VariantOption = {
@@ -59,30 +59,15 @@ export function AddToCart({
             {dict.productDetail.chooseOption}
           </span>
           <div className="flex flex-wrap gap-2">
-            {variants.map((variant) => {
-              const label =
-                [variant.size, variant.color].filter(Boolean).join(" / ") ||
-                dict.cart.default;
-              const outOfStock = variant.stock === 0;
-              return (
-                <button
-                  key={variant.id}
-                  type="button"
-                  disabled={outOfStock}
-                  onClick={() => setVariantId(variant.id)}
-                  className={cn(
-                    "hover-lift rounded-full border px-4 py-1.5 text-sm font-medium",
-                    outOfStock
-                      ? "cursor-not-allowed border-border text-muted-foreground/40 line-through"
-                      : variantId === variant.id
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border text-foreground hover:scale-105 hover:border-primary/50"
-                  )}
-                >
-                  {label}
-                </button>
-              );
-            })}
+            {variants.map((variant) => (
+              <VariantPill
+                key={variant.id}
+                label={variantLabel(variant, dict.cart.default)}
+                outOfStock={variant.stock === 0}
+                selected={variantId === variant.id}
+                onClick={() => setVariantId(variant.id)}
+              />
+            ))}
           </div>
         </div>
       )}

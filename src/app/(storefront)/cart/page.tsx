@@ -23,8 +23,8 @@ export default async function CartPage() {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-16">
-      <h1 className="text-3xl font-bold tracking-tight">{dict.cart.title}</h1>
+    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-16 sm:px-6 lg:px-8">
+      <h1 className="font-display text-4xl tracking-wide">{dict.cart.title}</h1>
 
       {cart.items.length === 0 ? (
         <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-20 text-center">
@@ -50,6 +50,8 @@ export default async function CartPage() {
                   color: item.variant.color,
                   unitPrice: effectiveUnitPrice(item.variant),
                   quantity: item.quantity,
+                  image: item.variant.product.images[0],
+                  category: item.variant.product.category,
                 }}
               />
             ))}

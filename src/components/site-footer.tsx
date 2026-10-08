@@ -15,7 +15,7 @@ export async function SiteFooter() {
   const campaign = getActiveCampaign();
 
   return (
-    <footer className="border-t bg-surface-brand text-surface-brand-foreground">
+    <footer className="border-t-2 border-accent bg-surface-brand text-surface-brand-foreground">
       {campaign && (
         <div
           className="relative h-1.5 overflow-hidden"
@@ -28,19 +28,19 @@ export async function SiteFooter() {
           />
         </div>
       )}
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-8 px-4 py-12 sm:grid-cols-3">
-        <div className="flex flex-col gap-3">
-          <Logo />
+      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-4 py-16 sm:grid-cols-3 sm:px-6 lg:grid-cols-[1.4fr_1fr_1fr] lg:px-8">
+        <div className="flex flex-col gap-4">
+          <Logo size="lg" />
           <p className="max-w-xs text-sm text-surface-brand-foreground/60">
             {dict.footer.tagline}
           </p>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <p className="text-sm font-semibold tracking-wide uppercase">
+        <div className="flex flex-col gap-3">
+          <p className="text-sm font-semibold tracking-wide text-accent uppercase">
             {dict.footer.shop}
           </p>
-          <nav className="flex flex-col gap-1.5">
+          <nav className="flex flex-col gap-2">
             {PRODUCT_CATEGORIES.map((category) => (
               <Link
                 key={category}
@@ -53,11 +53,11 @@ export async function SiteFooter() {
           </nav>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <p className="text-sm font-semibold tracking-wide uppercase">
+        <div className="flex flex-col gap-3">
+          <p className="text-sm font-semibold tracking-wide text-accent uppercase">
             {dict.footer.store}
           </p>
-          <div className="flex flex-col gap-1.5 text-sm text-surface-brand-foreground/60">
+          <div className="flex flex-col gap-2 text-sm text-surface-brand-foreground/60">
             <p>{dict.footer.basedInLebanon}</p>
             <p>{dict.footer.onlineInStore}</p>
             <p>{dict.footer.payment}</p>
@@ -65,7 +65,7 @@ export async function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <p className="mx-auto max-w-6xl px-4 py-4 text-xs text-surface-brand-foreground/50">
+        <p className="mx-auto max-w-6xl px-4 py-5 text-xs tracking-wide text-surface-brand-foreground/50 sm:px-6 lg:px-8">
           © {new Date().getFullYear()} Kick Off. {dict.footer.rights}
         </p>
       </div>

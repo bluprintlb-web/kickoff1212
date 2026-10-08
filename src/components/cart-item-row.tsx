@@ -2,8 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { ProductImage } from "@/components/product-image";
+import { CATEGORY_ICONS } from "@/lib/category-icons";
 import { formatLBP } from "@/lib/currency";
 import { dictionaries, type Locale } from "@/lib/i18n/dictionaries";
+import type { ProductCategoryValue } from "@/lib/product-category";
 import { trpc } from "@/trpc/react";
 
 type CartLine = {
@@ -13,6 +16,8 @@ type CartLine = {
   color: string | null;
   unitPrice: number;
   quantity: number;
+  image?: string | null;
+  category: ProductCategoryValue;
 };
 
 export function CartItemRow({
@@ -28,14 +33,25 @@ export function CartItemRow({
     onSuccess: () => router.refresh(),
   });
   const lineTotal = item.unitPrice * item.quantity;
+  const Icon = CATEGORY_ICONS[item.category];
 
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-4">
-      <div>
-        <p className="font-medium">{item.name}</p>
-        <p className="text-sm text-muted-foreground">
-          {[item.size, item.color].filter(Boolean).join(" / ") || dict.default}
-        </p>
+      <div className="flex min-w-0 items-center gap-3">
+        <ProductImage
+          src={item.image}
+          alt=""
+          icon={Icon}
+          className="size-14 shrink-0 border"
+          iconClassName="size-6"
+          sizes="56px"
+        />
+        <div className="min-w-0">
+          <p className="truncate font-medium">{item.name}</p>
+          <p className="text-sm text-muted-foreground">
+            {[item.size, item.color].filter(Boolean).join(" / ") || dict.default}
+          </p>
+        </div>
       </div>
       <div className="flex items-center gap-2">
         <Button

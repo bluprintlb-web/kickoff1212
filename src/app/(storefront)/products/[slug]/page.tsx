@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { AddToCart } from "@/components/add-to-cart";
+import { OffsetAccentFrame } from "@/components/offset-accent-frame";
 import { ProductImage } from "@/components/product-image";
 import { CATEGORY_ICONS } from "@/lib/category-icons";
 import { formatLBP } from "@/lib/currency";
@@ -26,21 +27,24 @@ export default async function ProductPage({
   const displayPrice = Number(product.salePrice ?? product.basePrice);
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-4 py-16 sm:flex-row sm:gap-12">
-      <ProductImage
-        src={product.images[0]}
-        alt={productName(product, locale)}
-        icon={Icon}
-        className="aspect-square w-full shrink-0 rounded-xl sm:w-96"
-        iconClassName="size-24"
-        sizes="(max-width: 640px) 100vw, 384px"
-      />
+    <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-10 px-4 py-16 sm:px-6 sm:flex-row sm:gap-14 lg:px-8">
+      <div className="group relative w-full shrink-0 sm:w-96">
+        <OffsetAccentFrame />
+        <ProductImage
+          src={product.images[0]}
+          alt={productName(product, locale)}
+          icon={Icon}
+          className="relative aspect-square w-full border"
+          iconClassName="size-24"
+          sizes="(max-width: 640px) 100vw, 384px"
+        />
+      </div>
 
-      <div className="flex flex-1 flex-col gap-4">
+      <div className="flex min-w-0 flex-1 flex-col gap-4">
         <span className="w-fit rounded-full bg-accent/15 px-2 py-0.5 text-xs font-medium tracking-wide text-accent-foreground uppercase">
           {dict.categories[product.category as ProductCategoryValue]}
         </span>
-        <h1 className="text-3xl font-bold tracking-tight">
+        <h1 className="font-display text-4xl tracking-wide">
           {productName(product, locale)}
         </h1>
 
